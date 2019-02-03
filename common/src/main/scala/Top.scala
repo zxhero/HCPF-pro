@@ -21,6 +21,8 @@ class Top(implicit val p: Parameters) extends Module {
   val io = IO(new Bundle {
     val ps_axi_slave = Flipped(adapter.axi.cloneType)
     val mem_axi = target.mem_axi4.head.cloneType
+    val hcpf_axi = (target.hcpfout.cloneType)
+    val test = Output(UInt(32.W))
   })
 
   io.mem_axi <> target.mem_axi4.head
@@ -32,6 +34,9 @@ class Top(implicit val p: Parameters) extends Module {
   target.tieOffInterrupts()
   target.dontTouchPorts()
   target.reset := adapter.io.sys_reset
+
+  io.hcpf_axi <> target.hcpfout
+  io.test := target.hcpftest
 }
 
 class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
@@ -41,6 +46,7 @@ class FPGAZynqTop(implicit p: Parameters) extends RocketSubsystem
     with HasSyncExtInterrupts
     with HasNoDebug
     with HasPeripherySerial
+    with HasPeripheryHCPF
     with HasPeripheryBlockDevice {
   override lazy val module = new FPGAZynqTopModule(this)
 }
@@ -53,4 +59,5 @@ class FPGAZynqTopModule(outer: FPGAZynqTop) extends RocketSubsystemModuleImp(out
     with HasNoDebugModuleImp
     with HasPeripherySerialModuleImp
     with HasPeripheryBlockDeviceModuleImp
+    with HasPeripheryHCPFModuleImp
     with DontTouch

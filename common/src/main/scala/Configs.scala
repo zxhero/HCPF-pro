@@ -6,6 +6,7 @@ import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.tilelink.BootROMParams
 import freechips.rocketchip.rocket.{RocketCoreParams, MulDivParams, DCacheParams, ICacheParams}
 import freechips.rocketchip.tile.{RocketTileParams, BuildCore, XLen}
+import freechips.rocketchip.diplomacy.{LazyModule, ValName}
 import testchipip._
 
 class WithBootROM extends Config((site, here, up) => {
@@ -46,6 +47,8 @@ class WithNMediumCores(n: Int) extends Config((site, here, up) => {
   }
 })
 
+//class WithPWM extends Config((site, here, up) => {})
+
 class DefaultConfig extends Config(
   new WithBootROM ++ new freechips.rocketchip.system.DefaultConfig)
 class DefaultMediumConfig extends Config(
@@ -61,3 +64,5 @@ class ZynqSmallConfig extends Config(new WithZynqAdapter ++ new DefaultSmallConf
 class ZynqFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqConfig)
 class ZynqMediumFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqMediumConfig)
 class ZynqSmallFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqSmallConfig)
+
+//class ZynqFPGAHCPFConfig extends Config(new WithoutTLMonitors ++ new ZynqConfig ++ WithPWM)

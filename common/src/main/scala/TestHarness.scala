@@ -17,7 +17,7 @@ class TestHarness(implicit val p: Parameters) extends Module {
 
   val config = p(ExtIn)
   val driver = Module(LazyModule(new TestHarnessDriver).module)
-  val dut = Module(LazyModule(new FPGAZynqTop).module)
+  val dut = Module(LazyModule(new FPGAZynqTop()(p)).module)
 
   dut.reset := driver.io.sys_reset
   dut.debug := DontCare
