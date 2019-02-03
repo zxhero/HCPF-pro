@@ -110,15 +110,15 @@ class ReadStage(params: HCPFParams) extends Module{
 
   io.ar_vaild := io.rdAddrEntry.valid
   io.ar_addr := Cat(4.U(3.W),io.rdAddrEntry.bits.raddr)
-  io.ar_size := 8.U
+  io.ar_size := 3.U
   io.ar_id := 1.U
-  io.ar_len := io.rdAddrEntry.bits.rsize(9,3)
+  io.ar_len := io.rdAddrEntry.bits.rsize(9,3) - 1.U
   io.r_ready := io.rdbuf_wdata.ready
 
   io.rdAddrEntry.ready := io.ar_ready
   io.rdDataEntry.ready := io.r_last && io.r_valid && io.rdbuf_wdata.ready
 
-  when(io.r_valid === true.B && io.rdbuf_wdata.ready === true.B){
+  when(io.r_last === false.B && io.r_valid === true.B && io.rdbuf_wdata.ready === true.B){
     readbuf_wcount := readbuf_wcount + 1.U
   }.elsewhen(io.r_last === true.B && io.r_valid === true.B && io.rdbuf_wdata.ready === true.B){
     readbuf_wcount := 0.U
@@ -137,16 +137,43 @@ class WriteStageBundle(params: HCPFParams) extends Bundle{
   val aw_size = Output(UInt(3.W))
   val aw_id = Output(UInt(4.W))
   val aw_len = Output(UInt(8.W))
+  val aw_ready = Input(Bool())
   val w_vaild = Output(Bool())
   val w_last = Output(Bool())
-  val w_data = Output(UInt(32.W))
+  val w_data = Output(UInt(64.W))
+  val w_ready = Input(Bool())
+  //val b_valid = Input(Bool())
   val b_ready = Output(Bool())
   val wtaddr = Flipped(Decoupled(new WriteAddrQueueEntry))
   val wtdata = Flipped(Decoupled(new WriteDataQueueEntry))
+  val wtbuf_raddr1 = Output(UInt(log2Ceil(params.buffNum).W))
+  val wtbuf_rdata1 = Input(UInt(64.W))
 }
 
 class WriteStage(params: HCPFParams) extends Module{
   val io = IO(new WriteStageBundle(params))
+  val writebuf_rcount = RegInit(0.U(log2Ceil(params.buffNum)))
+
+  io.aw_vaild := io.wtaddr.valid
+  io.aw_addr := Cat(4.U(3.W), io.wtaddr.bits.waddr)
+  io.aw_size := 3.U
+  io.aw_id := 1.U
+  io.aw_len := io.wtaddr.bits.wsize(9,3) - 1.U
+  io.w_vaild := io.wtdata.valid
+  io.b_ready := true.B
+  io.w_last := writebuf_rcount === (io.wtdata.bits.wsize(9,3) - 1.U)
+
+  io.wtaddr.ready := io.aw_ready
+  io.wtdata.ready := io.w_last && io.wtdata.valid && io.w_ready
+
+  when(io.w_last === false.B && io.wtdata.valid === true.B && io.w_ready === true.B){
+    writebuf_rcount := writebuf_rcount + 1.U
+  }.elsewhen(io.w_last === true.B && io.wtdata.valid === true.B && io.w_ready === true.B){
+    writebuf_rcount := 0.U
+  }
+
+  io.wtbuf_raddr1 := io.wtdata.bits.data(9,1) + writebuf_rcount
+  io.w_data := io.wtbuf_rdata1
 }
 
 class HCPFControllerBundle (params: HCPFParams)extends Bundle{
@@ -168,7 +195,6 @@ class HCPFControllerBundle (params: HCPFParams)extends Bundle{
 
 class HCPFController (params: HCPFParams)extends Module {
   val io = IO(new HCPFControllerBundle(params))
-
 
   val readstage = Module(new ReadStage(params))
   val free_entry_ptr = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
@@ -193,6 +219,11 @@ class HCPFController (params: HCPFParams)extends Module {
   val writebuf_wstage = RegInit(w_idole)
   val readbuf_wstage = RegInit(w_idole)
   read_finish := (io.Request.valid === true.B) && (io.Request.bits.request_type === 0.U) && (io.Request.bits.others(1,0) === 0.U)
+  when(io.Request.bits.request_type === 3.U){
+    io.Request.ready := Mux(io.Request.bits.others(0) === 1.U, writebuf_wstage === w_new, readbuf_wstage === w_back)
+  }.otherwise{
+    io.Request.ready := true.B
+  }
 //read instructions
   read_table.io.wen := io.Request.valid === true.B && io.Request.bits.request_type === 0.U(2.W) && (io.Request.bits.others(1,0) =/= 0.U)
   read_table.io.wdata.option := 0.U
@@ -327,21 +358,21 @@ trait HCPFTLModule extends HasRegMap {
   val io: HCPFTLBundle
   implicit val p: Parameters
   def params: HCPFParams
-  //val addr_bits = log2Ceil(params.buffNum)
+  val addr_bits = log2Ceil(params.buffNum)
   //val out
   val base = Module(new HCPFController(params))
 
   io.axi.ar.valid := base.readstage.io.ar_vaild
   io.axi.aw.bits.prot := 0.U
   io.axi.aw.bits.qos := 0.U
-  io.axi.aw.bits.len := base.io.mem_aw_len
-  io.axi.aw.bits.addr := base.io.mem_aw_addr
+  io.axi.aw.bits.len := base.writestage.io.aw_len
+  io.axi.aw.bits.addr := base.writestage.io.aw_addr
   io.axi.aw.bits.cache := 0.U
   io.axi.aw.bits.lock := 0.U
-  io.axi.aw.bits.size := base.io.mem_aw_size
-  io.axi.aw.valid := base.io.mem_aw_vaild
-  io.axi.aw.bits.burst := 0.U
-  io.axi.aw.bits.id := base.io.mem_aw_id
+  io.axi.aw.bits.size := base.writestage.io.aw_size
+  io.axi.aw.valid := base.writestage.io.aw_vaild
+  io.axi.aw.bits.burst := 1.U(2.W)
+  io.axi.aw.bits.id := base.writestage.io.aw_id
   io.axi.ar.bits.addr := base.readstage.io.ar_addr
   io.axi.ar.bits.prot := 0.U
   io.axi.ar.bits.cache := 0.U
@@ -351,29 +382,43 @@ trait HCPFTLModule extends HasRegMap {
   io.axi.ar.bits.burst := 1.U(2.W)    //Incr
   io.axi.ar.bits.id := base.readstage.io.ar_id
   io.axi.ar.bits.len := base.readstage.io.ar_len
-  io.axi.w.bits.last := base.io.mem_w_last
-  io.axi.w.bits.data := base.io.mem_w_data
+  io.axi.w.bits.last := base.writestage.io.w_last
+  io.axi.w.bits.data := base.writestage.io.w_data
   io.axi.w.bits.strb := 0.U
-  io.axi.w.valid := base.io.mem_w_vaild
-  io.axi.b.ready := base.io.mem_b_ready
+  io.axi.w.valid := base.writestage.io.w_vaild
+  io.axi.b.ready := base.writestage.io.b_ready
   io.axi.r.ready := base.readstage.io.r_ready
 
   val read_BUFF = Module(new Blkbuf(params.buffNum, w = 64))
-  //val write_BUFF = Module(new Blkbuf(params.buffNum, w = 32))
+  val write_BUFF = Module(new Blkbuf(params.buffNum, w = 32))
   val read_offset = RegInit(0.U(64.W))
-  val read_data = Cat(read_BUFF.io.rdata2, read_BUFF.io.rdata1)
+  val read_data = read_BUFF.io.rdata2
   val RWrequest = Wire(new RegisterWriteIO(UInt(64.W)))
 
   base.io.rdbuf_wdata.ready := true.B
   base.io.Request.valid := RWrequest.request.valid
   base.io.Request.bits.request_type := RWrequest.request.bits(63,62)
   base.io.Request.bits.others := RWrequest.request.bits(61,0)
+  base.writestage.io.aw_ready := io.axi.aw.ready
+  base.writestage.io.w_ready := io.axi.w.ready
+  base.readstage.io.ar_ready := io.axi.ar.ready
+  base.io.rdbuf_rdata1 := read_BUFF.io.rdata1
+  base.writestage.io.wtbuf_rdata1 := write_BUFF.io.rdata1
+  base.io.wtbuf_wdata.ready := true.B
 
-  read_BUFF.io.raddr1 := read_offset(addr_bits-1,0)
-  read_BUFF.io.raddr2 := read_offset(32+addr_bits-1,32)
-  read_BUFF.io.waddr := RWrequest.request.bits(32+addr_bits-1,32)
-  read_BUFF.io.wen := RWrequest.request.valid
-  read_BUFF.io.wdata := RWrequest.request.bits(31,0)
+  read_BUFF.io.raddr1 := base.io.rdbuf_raddr1
+  read_BUFF.io.raddr2 := read_offset(addr_bits-1,1)
+  read_BUFF.io.waddr := base.io.rdbuf_waddr
+  read_BUFF.io.wen := base.io.rdbuf_wdata.valid
+  read_BUFF.io.wdata := base.io.rdbuf_wdata.bits
+  read_BUFF.io.select := base.io.rdbuf_wselect
+
+  write_BUFF.io.raddr1 := base.writestage.io.wtbuf_raddr1
+  write_BUFF.io.raddr2 := 0.U
+  write_BUFF.io.waddr := base.io.wtbuf_waddr
+  write_BUFF.io.wen := base.io.wtbuf_wdata.valid
+  write_BUFF.io.wdata := base.io.wtbuf_wdata.bits
+  write_BUFF.io.select := base.io.wtbuf_wselect
 
   RWrequest.request.ready := base.io.Request.ready
   RWrequest.response.valid := true.B
