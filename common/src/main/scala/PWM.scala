@@ -11,7 +11,9 @@ import freechips.rocketchip.regmapper.{HasRegMap, RegField, RegisterReadIO, Regi
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.util.UIntIsOneOf
 
-case class HCPFParams(address: BigInt, beatBytes: Int, buffNum: Int=512, tableEntryNum: Int=128, tableEntryBits: Int=56)
+case class HCPFParams(address: BigInt, beatBytes: Int)
+
+case class HCPFBaseParams( buffNum: Int=512, tableEntryNum: Int=128, tableEntryBits: Int=56)
 
 class Blkbuf(num : Int, w : Int) extends Module {
   val io = IO(new Bundle{
@@ -58,7 +60,7 @@ class WriteDataQueueEntry extends Bundle{
   val data = UInt(32.W)
 }
 
-class ReadTableEntry (params: HCPFParams)extends Bundle{
+class ReadTableEntry (params: HCPFBaseParams)extends Bundle{
   val rtype = UInt(2.W)
   val rsize = UInt(10.W)
   val raddr = UInt(28.W)
@@ -66,7 +68,7 @@ class ReadTableEntry (params: HCPFParams)extends Bundle{
   val option = UInt(log2Ceil(params.tableEntryNum).W)
 }
 
-class ReadTable (params: HCPFParams) extends Module{
+class ReadTable (params: HCPFBaseParams) extends Module{
   val io = IO(new Bundle{
     val wen = Input(Bool())
     val wdata = Input(new ReadTableEntry(params))
@@ -86,7 +88,7 @@ class ReadTable (params: HCPFParams) extends Module{
   io.rdata3 := buf(io.raddr3)
 }
 
-class ReadStageBundle(params: HCPFParams) extends Bundle{
+class ReadStageBundle(params: HCPFBaseParams) extends Bundle{
   val ar_vaild = Output(Bool())
   val ar_addr = Output(UInt(32.W))
   val ar_size = Output(UInt(3.W))
@@ -104,7 +106,7 @@ class ReadStageBundle(params: HCPFParams) extends Bundle{
   val rdbuf_wlast = Output(Bool())
 }
 
-class ReadStage(params: HCPFParams) extends Module{
+class ReadStage(params: HCPFBaseParams) extends Module{
   val io = IO(new ReadStageBundle(params))
   val readbuf_wcount = RegInit(0.U(log2Ceil(params.buffNum)))
 
@@ -131,7 +133,7 @@ class ReadStage(params: HCPFParams) extends Module{
 
 }
 
-class WriteStageBundle(params: HCPFParams) extends Bundle{
+class WriteStageBundle(params: HCPFBaseParams) extends Bundle{
   val aw_vaild = Output(Bool())
   val aw_addr = Output(UInt(32.W))
   val aw_size = Output(UInt(3.W))
@@ -150,7 +152,7 @@ class WriteStageBundle(params: HCPFParams) extends Bundle{
   val wtbuf_rdata1 = Input(UInt(64.W))
 }
 
-class WriteStage(params: HCPFParams) extends Module{
+class WriteStage(params: HCPFBaseParams) extends Module{
   val io = IO(new WriteStageBundle(params))
   val writebuf_rcount = RegInit(0.U(log2Ceil(params.buffNum)))
 
@@ -176,7 +178,7 @@ class WriteStage(params: HCPFParams) extends Module{
   io.w_data := io.wtbuf_rdata1
 }
 
-class HCPFControllerBundle (params: HCPFParams)extends Bundle{
+class HCPFControllerBundle (params: HCPFBaseParams)extends Bundle{
   val Request = Flipped(Decoupled(new RWRequest))
   //val newReadAddr = Decoupled(new ReadTableEntry(params))
   //val newReadData = Decoupled(new ReadTableEntry(params))
@@ -193,7 +195,7 @@ class HCPFControllerBundle (params: HCPFParams)extends Bundle{
   val wtbuf_wdata = Decoupled(UInt(64.W))
 }
 
-class HCPFController (params: HCPFParams)extends Module {
+class HCPFController (params: HCPFBaseParams)extends Module {
   val io = IO(new HCPFControllerBundle(params))
 
   val readstage = Module(new ReadStage(params))
@@ -214,7 +216,7 @@ class HCPFController (params: HCPFParams)extends Module {
   val writebuf_wsize = RegInit(0.U(10.W))
   val wback_addrqueue_entry = Reg(new WriteAddrQueueEntry)
   val wback_dataqueue_entry = Reg(new WriteDataQueueEntry)
-  val write_buf_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
+  //val write_buf_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
   val w_idole :: w_back :: w_new :: Nil = Enum(3)
   val writebuf_wstage = RegInit(w_idole)
   val readbuf_wstage = RegInit(w_idole)
@@ -312,7 +314,7 @@ class HCPFController (params: HCPFParams)extends Module {
   }
 
   when(read_finish === true.B && io.Request.bits.others(3,2) === 3.U && writebuf_wstage === w_idole){
-    writebuf_waddr := io.Request.bits.others(23,15)
+    writebuf_waddr := read_table.io.rdata3.rdata_ptr//io.Request.bits.others(23,15)
     writebuf_wdata_source_addr := read_table.io.rdata3.rdata_ptr
   }.elsewhen(writebuf_wstage === w_back){
     writebuf_waddr := writebuf_waddr + 1.U
@@ -354,13 +356,14 @@ trait HCPFTLBundle extends Bundle {
   val out = Output(UInt(32.W))
 }
 
-trait HCPFTLModule extends HasRegMap {
+trait HCPFTLModule  extends HasRegMap {
   val io: HCPFTLBundle
   implicit val p: Parameters
   def params: HCPFParams
-  val addr_bits = log2Ceil(params.buffNum)
+  def zparams : HCPFBaseParams
+  val addr_bits = log2Ceil(zparams.buffNum)
   //val out
-  val base = Module(new HCPFController(params))
+  val base = Module(new HCPFController(zparams))
 
   io.axi.ar.valid := base.readstage.io.ar_vaild
   io.axi.aw.bits.prot := 0.U
@@ -389,10 +392,11 @@ trait HCPFTLModule extends HasRegMap {
   io.axi.b.ready := base.writestage.io.b_ready
   io.axi.r.ready := base.readstage.io.r_ready
 
-  val read_BUFF = Module(new Blkbuf(params.buffNum, w = 64))
-  val write_BUFF = Module(new Blkbuf(params.buffNum, w = 32))
+  val read_BUFF = Module(new Blkbuf(zparams.buffNum, w = 64))
+  val write_BUFF = Module(new Blkbuf(zparams.buffNum, w = 32))
   val read_offset = RegInit(0.U(64.W))
-  val read_data = read_BUFF.io.rdata2
+  val read_data = Wire(UInt(64.W))
+  read_data := Mux(base.cpu_operate_ptr === base.new_read_data_ptr,(-1).S(64.W),read_BUFF.io.rdata2)
   val RWrequest = Wire(new RegisterWriteIO(UInt(64.W)))
 
   base.io.rdbuf_wdata.ready := true.B
@@ -407,7 +411,7 @@ trait HCPFTLModule extends HasRegMap {
   base.io.wtbuf_wdata.ready := true.B
 
   read_BUFF.io.raddr1 := base.io.rdbuf_raddr1
-  read_BUFF.io.raddr2 := read_offset(addr_bits-1,1)
+  read_BUFF.io.raddr2 := base.io.cpuOperateEntry.rdata_ptr + read_offset(addr_bits-1,1)
   read_BUFF.io.waddr := base.io.rdbuf_waddr
   read_BUFF.io.wen := base.io.rdbuf_wdata.valid
   read_BUFF.io.wdata := base.io.rdbuf_wdata.bits
@@ -452,7 +456,7 @@ trait HasPeripheryHCPF { this: BaseSubsystem =>
   private val portName = "hcpf"
 
   val hcpf = LazyModule(new PWMTL(
-    HCPFParams(address, pbus.beatBytes))(p))
+    HCPFParams(address=address, beatBytes = pbus.beatBytes))(p))
 
   pbus.toVariableWidthSlave(Some(portName)) { hcpf.node }
 }
