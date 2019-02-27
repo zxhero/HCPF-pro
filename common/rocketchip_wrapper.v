@@ -287,6 +287,52 @@ module rocketchip_wrapper
         .S_AXI_wready(S_AXI_wready),
         .S_AXI_wstrb(S_AXI_wstrb),
         .S_AXI_wvalid(S_AXI_wvalid),
+		
+        // slave AXI interface (fpga = master, zynq = slave) 
+        // connected directly to DDR controller to handle test chip mem
+		.hcpf_S_AXI_araddr(hcpf_AXI_araddr),
+        .hcpf_S_AXI_arburst(hcpf_AXI_arburst),
+        .hcpf_S_AXI_arcache('d0),
+        .hcpf_S_AXI_arid(hcpf_AXI_arid),
+        .hcpf_S_AXI_arlen(hcpf_AXI_arlen),
+        .hcpf_S_AXI_arlock('d0),
+        .hcpf_S_AXI_arprot('d0),
+        .hcpf_S_AXI_arqos('d0),
+        .hcpf_S_AXI_arready(hcpf_AXI_arready),
+        .hcpf_S_AXI_arregion(4'b0),
+        .hcpf_S_AXI_arsize(hcpf_AXI_arsize),
+        .hcpf_S_AXI_arvalid(hcpf_AXI_arvalid),
+        //
+        .hcpf_S_AXI_awaddr(hcpf_AXI_awaddr),
+        .hcpf_S_AXI_awburst(hcpf_AXI_awburst),
+        .hcpf_S_AXI_awcache('d0),
+        .hcpf_S_AXI_awid(hcpf_AXI_awid),
+        .hcpf_S_AXI_awlen(hcpf_AXI_awlen),
+        .hcpf_S_AXI_awlock('d0),
+        .hcpf_S_AXI_awprot('d0),
+        .hcpf_S_AXI_awqos('d0),
+        .hcpf_S_AXI_awready(hcpf_AXI_awready),
+        .hcpf_S_AXI_awregion(4'b0),
+        .hcpf_S_AXI_awsize(hcpf_AXI_awsize),
+        .hcpf_S_AXI_awvalid(hcpf_AXI_awvalid),
+        //
+        .hcpf_S_AXI_bid(),
+        .hcpf_S_AXI_bready(hcpf_AXI_bready),
+        .hcpf_S_AXI_bresp(),
+        .hcpf_S_AXI_bvalid(hcpf_AXI_bvalid),
+        //
+        .hcpf_S_AXI_rid(hcpf_AXI_rid),
+        .hcpf_S_AXI_rdata(hcpf_AXI_rdata),
+        .hcpf_S_AXI_rlast(hcpf_AXI_rlast),
+        .hcpf_S_AXI_rready(hcpf_AXI_rready),
+        .hcpf_S_AXI_rresp(),
+        .hcpf_S_AXI_rvalid(hcpf_AXI_rvalid),
+        //
+        .hcpf_S_AXI_wdata(hcpf_AXI_wdata),
+        .hcpf_S_AXI_wlast(hcpf_AXI_wlast),
+        .hcpf_S_AXI_wready(hcpf_AXI_wready),
+        .hcpf_S_AXI_wstrb('d0),
+        .hcpf_S_AXI_wvalid(hcpf_AXI_wvalid),
         .ext_clk_in(host_clk)
         );
 
