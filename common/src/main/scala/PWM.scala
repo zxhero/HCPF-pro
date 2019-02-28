@@ -13,7 +13,7 @@ import freechips.rocketchip.util.UIntIsOneOf
 
 case class HCPFParams(address: BigInt, beatBytes: Int, buffNum: Int, tableEntryNum: Int, tableEntryBits: Int)
 
-//case class HCPFBaseParams( buffNum: Int=512, tableEntryNum: Int=64, tableEntryBits: Int=56)
+//case class HCPFBaseParams( buffNum: Int=1024, tableEntryNum: Int=64, tableEntryBits: Int=56)
 
 class Blkbuf(num : Int, w : Int) extends Module {
   val io = IO(new Bundle{
@@ -98,11 +98,10 @@ class WriteDataQueueEntry extends Bundle{
 }
 
 class ReadTableEntry extends Bundle{
-  val rtype = UInt(2.W)
   val rsize = UInt(10.W)
   val raddr = UInt(28.W)
-  val rdata_ptr = UInt(log2Ceil(512).W)
-  val option = UInt(log2Ceil(128).W)
+  val rdata_ptr = UInt(log2Ceil(1024).W)
+  val option = UInt(log2Ceil(64).W)
 }
 
 class ReadTable (params: HCPFParams) extends Module{
@@ -311,57 +310,215 @@ class WriteStage(params: HCPFParams) extends Module{
 }
 
 class HCPFControllerBundle (params: HCPFParams)extends Bundle{
-  val Request = Flipped(Decoupled(new RWRequest))
+  //val Request = Flipped(Decoupled(new RWRequest))
   //val newReadAddr = Decoupled(new ReadTableEntry(params))
   //val newReadData = Decoupled(new ReadTableEntry(params))
-  val cpuOperateEntry1 = Output(new ReadTableEntry)
-  val cpuOperateEntry2 = Output(new ReadTableEntry)
-  val cpuOperateEntry3 = Output(new ReadTableEntry)
+  //val cpuOperateEntry1 = Output(new ReadTableEntry)
+  //val cpuOperateEntry2 = Output(new ReadTableEntry)
+  //val cpuOperateEntry3 = Output(new ReadTableEntry)
   //val newWriteAddr = Decoupled(new WriteAddrQueueEntry)
   //val newWriteData = Decoupled(new WriteDataQueueEntry)
-  val rdbuf1_raddr1 = Output(UInt(log2Ceil(params.buffNum).W))
-  val rdbuf1_rdata1 = Input(UInt(64.W))
+  //val rdbuf1_raddr1 = Output(UInt(log2Ceil(params.buffNum).W))
+  //val rdbuf1_rdata1 = Input(UInt(64.W))
   val rdbuf1_waddr = Output(UInt(log2Ceil(params.buffNum).W))
   val rdbuf1_wselect = Output(UInt(2.W))
   val rdbuf1_wdata = Decoupled(UInt(64.W))
-  val rdbuf2_waddr = Output(UInt(log2Ceil(params.buffNum).W))
+  /*val rdbuf2_waddr = Output(UInt(log2Ceil(params.buffNum).W))
   val rdbuf2_wselect = Output(UInt(2.W))
   val rdbuf2_wdata = Decoupled(UInt(64.W))
   val rdbuf3_waddr = Output(UInt(log2Ceil(params.buffNum).W))
   val rdbuf3_wselect = Output(UInt(2.W))
-  val rdbuf3_wdata = Decoupled(UInt(64.W))
+  val rdbuf3_wdata = Decoupled(UInt(64.W))*/
   val wtbuf_raddr1 = Output(UInt(log2Ceil(params.buffNum).W))
   val wtbuf_rdata1 = Input(UInt(64.W))
   val wtbuf_waddr = Output(UInt(log2Ceil(params.buffNum).W))
   val wtbuf_wselect = Output(UInt(2.W))
   val wtbuf_wdata = Decoupled(UInt(64.W))
-  val wstage_axi = new WriteStageAxi
-  val rstage_axi = new ReadStageAxi
-  val rdStatus1 = Output(UInt(64.W))
-  val rdStatus2 = Output(UInt(64.W))
-  val rdStatus3 = Output(UInt(64.W))
+  //val wstage_axi = new WriteStageAxi
+  //val rstage_axi = new ReadStageAxi
+  //val rdStatus1 = Output(UInt(64.W))
+  //val rdStatus2 = Output(UInt(64.W))
+  //val rdStatus3 = Output(UInt(64.W))
   //val rdata_valid = Output(Bool())
 }
 
-class HCPFType1Controller (params: HCPFParams) extends  Module{
-
+class HCPFType1ControllerBundle (params: HCPFParams) extends Bundle{
+  val Request = Flipped(Decoupled(new RWRequest))
+  val WtBufWaddr = Output(UInt(log2Ceil(params.buffNum).W))
+  val WtBufWselect = Output(UInt(2.W))
+  val WtBufWdata = Decoupled(UInt(64.W))
+  val WtBufRaddr1 = Output(UInt(log2Ceil(params.buffNum).W))
+  val WtBufRdata1 = Input(UInt(64.W))
+  val WStageAxi = new WriteStageAxi
+  val WriteBackAddr = Flipped(Decoupled(new WriteAddrQueueEntry))
+  val WriteBackData = Flipped(Decoupled(new WriteDataQueueEntry))
+  val RequestQueueEmpty = Output(Bool())
 }
 
-class HCPFType2Controller (params: HCPFParams) extends  Module{
+class HCPFType1Controller (params: HCPFParams) extends  Module{
+  val io = IO(new HCPFType1ControllerBundle(params))
+  val writestage = Module(new WriteStage(params))
+  val write_addr_queue = Module(new Queue(new WriteAddrQueueEntry, 128))
+  val write_data_queue = Module(new Queue(new WriteDataQueueEntry,128))
+  val request_queue = Module(new Queue(new RWRequest, entries = 128))
 
+  request_queue.io.enq <> io.Request
+  io.RequestQueueEmpty := (request_queue.io.count === 0.U)
+  request_queue.io.deq.ready := io.WriteBackAddr.valid === false.B & write_addr_queue.io.enq.ready
+  when(request_queue.io.deq.bits.request_type === 1.U(2.W) || request_queue.io.deq.bits.request_type === 2.U){
+    request_queue.io.deq.ready := (io.WriteBackAddr.valid === false.B) & write_addr_queue.io.enq.ready
+  }.otherwise{
+    request_queue.io.deq.ready := io.WtBufWdata.ready
+  }
+  //instruction 2 and 3
+  when(io.WriteBackAddr.valid === true.B){
+    write_addr_queue.io.enq <> io.WriteBackAddr
+    write_data_queue.io.enq <> io.WriteBackData
+  }.otherwise{
+    write_addr_queue.io.enq.bits.waddr := request_queue.io.deq.bits.others(27,0)
+    write_addr_queue.io.enq.bits.wsize := Mux(request_queue.io.deq.bits.request_type === 1.U, request_queue.io.deq.bits.others(61,52), request_queue.io.deq.bits.others(61,60))
+    write_data_queue.io.enq.bits.data := Mux(request_queue.io.deq.bits.request_type === 1.U, request_queue.io.deq.bits.others(37,29), request_queue.io.deq.bits.others(59,28))
+    write_data_queue.io.enq.bits.wsize := Mux(request_queue.io.deq.bits.request_type === 1.U, request_queue.io.deq.bits.others(61,52), request_queue.io.deq.bits.others(61,60))
+    write_data_queue.io.enq.bits.wtype := request_queue.io.deq.bits.request_type
+    write_addr_queue.io.enq.valid := Mux(request_queue.io.deq.bits.request_type === 1.U(2.W) || request_queue.io.deq.bits.request_type === 2.U, request_queue.io.deq.valid, false.B)
+    write_data_queue.io.enq.valid := Mux(request_queue.io.deq.bits.request_type === 1.U(2.W) || request_queue.io.deq.bits.request_type === 2.U, request_queue.io.deq.valid, false.B)
+  }
+
+  writestage.io.wtaddr <> write_addr_queue.io.deq
+  writestage.io.wtdata <> write_data_queue.io.deq
+  io.WtBufRaddr1 := writestage.io.wtbuf_raddr1
+  writestage.io.wtbuf_rdata1 := io.WtBufRdata1
+  io.WStageAxi <> writestage.io.axi
+  //instruction 5
+  io.WtBufWdata.valid := Mux(request_queue.io.deq.bits.request_type === 3.U, request_queue.io.deq.valid, false.B)
+  io.WtBufWdata.bits := Cat(0.U(32.W), request_queue.io.deq.bits.others(32,1))
+  io.WtBufWaddr :=  request_queue.io.deq.bits.others(42,33)
+  io.WtBufWselect := 1.U(2.W)
+}
+
+/*class HCPFType2Controller (params: HCPFParams) extends  Module{
+
+}*/
+
+class WriteBackInformation extends Bundle{
+  val wsize = UInt(10.W)
+  val wbuf_ptr = UInt(10.W)
+  val waddr = UInt(28.W)
+}
+
+class HCPFType3ControllerBundle (params: HCPFParams) extends Bundle{
+  val Request = Flipped(Decoupled(new RWRequest))
+  val WtBufWaddr = Output(UInt(log2Ceil(params.buffNum).W))
+  val WtBufWselect = Output(UInt(2.W))
+  val WtBufWdata = Decoupled(UInt(64.W))
+  val RdBufRaddr1 = Output(UInt(log2Ceil(params.buffNum).W))
+  val RdBufRdata1 = Input(UInt(64.W))
+  val RdBufWaddr = Output(UInt(log2Ceil(params.buffNum).W))
+  val RdBufWselect = Output(UInt(2.W))
+  val RdBufWdata = Decoupled(UInt(64.W))
+  val CpuOperatePtr = Output(UInt(log2Ceil(params.tableEntryNum).W))
+  val CpuOperateEntry1 = Input(new ReadTableEntry)
+  val WriteBackAddr = Decoupled(new WriteAddrQueueEntry)
+  val WriteBackData = Decoupled(new WriteDataQueueEntry)
+  val RequestQueueEmpty = Output(Bool())
 }
 
 class HCPFType3Controller (params: HCPFParams) extends  Module{
+  val io = IO(new HCPFType3ControllerBundle(params))
+  val cpu_operate_ptr = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  val read_finish = Wire(Bool())
+  val writebuf_wptr = RegInit(0.U(log2Ceil(params.buffNum)))
+  val writebuf_wdata_source_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
+  val writebuf_wcount = RegInit(0.U(log2Ceil(params.buffNum).W))
+  //val writebuf_wsize = RegInit(0.U(10.W))
+  val jump_index = Wire(UInt(log2Ceil(params.tableEntryNum).W))
+  val request_queue = Module(new Queue(new RWRequest, entries = 128))
+  val idole :: busy :: Nil = Enum(2)
+  val wdata_state = RegInit(idole)
+  //val change_ptr_state = RegInit(idole)
+  val send_request_state = RegInit(idole)
+  val global_state = wdata_state === idole && send_request_state === idole
+  val write_back_inf = Reg(new WriteBackInformation)
 
+  request_queue.io.enq <> io.Request
+  when(request_queue.io.deq.bits.request_type === 3.U ){
+    request_queue.io.deq.ready := io.RdBufWdata.ready
+  }.elsewhen(read_finish === true.B && io.Request.bits.others(3,2) === 3.U){
+    request_queue.io.deq.ready := (send_request_state === idole && last_data === true.B && io.WtBufWdata.valid === true.B && io.WtBufWdata.ready === true.B) || (wdata_state === idole && io.WriteBackAddr.ready === true.B)
+  }.otherwise{
+    request_queue.io.deq.ready := true.B
+  }
+  io.RequestQueueEmpty := request_queue.io.count === 0.U
+  //instruction 4
+  io.RdBufWdata.valid := request_queue.io.deq.bits.request_type === 3.U
+  io.RdBufWdata.bits := request_queue.io.deq.bits.others(32,1)
+  io.RdBufWaddr := io.CpuOperateEntry1.rdata_ptr +io.Request.bits.others(42,33)
+  io.RdBufWselect := 1.U(2.W)
+  //instruction 6 and 7
+  val last_data = ((writebuf_wcount + 1.U) * 4.U) === request_queue.io.deq.bits.others(61,52)
+  io.WriteBackAddr.valid := send_request_state === busy
+  io.WriteBackAddr.bits.wsize := write_back_inf.wsize
+  io.WriteBackAddr.bits.waddr := write_back_inf.waddr
+  io.WriteBackData.valid := send_request_state === busy
+  io.WriteBackData.bits.data := Cat(0.U(22.W),write_back_inf.wbuf_ptr)
+  io.WriteBackData.bits.wsize := write_back_inf.wsize
+  io.WriteBackData.bits.wtype := 1.U(2.W)
+  io.CpuOperatePtr := cpu_operate_ptr
+  io.WtBufWaddr := writebuf_wptr
+  io.WtBufWselect := 3.U(2.W)
+  io.WtBufWdata.valid := read_finish && request_queue.io.deq.bits.others(3,2) === 3.U && wdata_state === busy
+  io.WtBufWdata.bits := io.RdBufRdata1
+  io.RdBufRaddr1 := writebuf_wdata_source_ptr
+  read_finish := request_queue.io.deq.valid === true.B && (request_queue.io.deq.bits.request_type === 0.U)
+  when(read_finish === true.B && global_state === true.B){
+    cpu_operate_ptr := cpu_operate_ptr + request_queue.io.deq.bits.others(51,48)
+  }
+
+  when(io.WtBufWdata.valid === true.B && io.WtBufWdata.ready === true.B){
+    writebuf_wcount := writebuf_wcount + io.WtBufWselect(1) + io.WtBufWselect(0)
+  }.elsewhen(last_data === true.B && io.WtBufWdata.valid === true.B && io.WtBufWdata.ready === true.B){
+    writebuf_wcount := 0.U
+  }
+
+  when(read_finish === true.B && io.Request.bits.others(3,2) === 3.U && global_state === true.B){
+    write_back_inf.wsize := request_queue.io.deq.bits.others(61,52)
+    write_back_inf.wbuf_ptr := request_queue.io.deq.bits.others(23,14)
+    write_back_inf.waddr := io.CpuOperateEntry1.raddr + request_queue.io.deq.bits.others(13,4) * 4.U
+    writebuf_wptr := request_queue.io.deq.bits.others(23,14)
+    writebuf_wdata_source_ptr := io.CpuOperateEntry1.rdata_ptr + request_queue.io.deq.bits.others(13,4)
+  }.elsewhen(io.WtBufWdata.valid === true.B && io.WtBufWdata.ready === true.B){
+    writebuf_wptr := writebuf_wptr + io.WtBufWselect(1) + io.WtBufWselect(0)
+    writebuf_wdata_source_ptr := writebuf_wdata_source_ptr + io.WtBufWselect(1) + io.WtBufWselect(0)
+  }
+
+  when(global_state === true.B && read_finish === true.B && io.Request.bits.others(3,2) === 3.U){
+    wdata_state := busy
+    send_request_state := busy
+  }.elsewhen(wdata_state === busy && last_data === true.B && io.WtBufWdata.valid === true.B && io.WtBufWdata.ready === true.B){
+    wdata_state := idole
+  }.elsewhen(io.WriteBackAddr.ready === true.B && send_request_state === busy){
+    send_request_state := idole
+  }
+}
+
+class HCPFType4ControllerBundle (params: HCPFParams) extends Bundle{
+  val Request = Flipped(Decoupled(new RWRequest))
+  val RdBufWaddr = Output(UInt(log2Ceil(params.buffNum).W))
+  val RdBufWselect = Output(UInt(2.W))
+  val RdBufWdata = Decoupled(UInt(64.W))
+  val RStageAxi = new ReadStageAxi
+  val RdStatus1 = Output(UInt(64.W))
+  val RdStatus2 = Output(UInt(64.W))
+  val RdStatus3 = Output(UInt(64.W))
+  val CpuOperatePtr = Input(UInt(log2Ceil(params.tableEntryNum).W))
+  val CpuOperateEntry1 = Output(new ReadTableEntry)
+  val CpuOperateEntry2 = Output(new ReadTableEntry)
+  val CpuOperateEntry3 = Output(new ReadTableEntry)
+  val ReadTableFinish = Output(Bool())
 }
 
 class HCPFType4Controller (params: HCPFParams) extends  Module{
-
-}
-class HCPF
-class HCPFController (params: HCPFParams)extends Module {
-  val io = IO(new HCPFControllerBundle(params))
-
+  val io = IO(new HCPFType4ControllerBundle(params))
   val readstage = Module(new ReadStage(params))
   val free_entry_ptr1 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
   val free_entry_ptr2 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
@@ -369,61 +526,57 @@ class HCPFController (params: HCPFParams)extends Module {
   val new_read_addr_ptr1 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
   val new_read_addr_ptr2 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
   val new_read_addr_ptr3 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
-  //val new_read_data_ptr = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
-  val cpu_operate_ptr = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
- // val read_buf_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
   val read_table1 = Module(new ReadTable(params))
   val read_table2 = Module(new ReadTable(params))
   val read_table3 = Module(new ReadTable(params))
-  val read_finish = Wire(Bool())
+  val read_type1 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 1.U(2.W)
+  val read_type2 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 2.U(2.W)
+  val read_type3 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 3.U(2.W)
+  //instruction 1
+  io.RStageAxi <> readstage.io.axi
+  io.CpuOperateEntry1 := read_table1.io.rdata3
+  io.CpuOperateEntry2 := read_table2.io.rdata3
+  io.CpuOperateEntry3 := read_table3.io.rdata3
 
-  val writestage = Module(new WriteStage(params))
-  val write_addr_queue = Module(new Queue(new WriteAddrQueueEntry, 128))
-  val write_data_queue = Module(new Queue(new WriteDataQueueEntry,128))
-  val writebuf_wptr = RegInit(0.U(log2Ceil(params.buffNum)))
-  val writebuf_wdata_source_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
-  val writebuf_wcount = RegInit(0.U(log2Ceil(params.buffNum).W))
-  val writebuf_wsize = RegInit(0.U(10.W))
-  val jump_index = Wire(UInt(log2Ceil(params.tableEntryNum).W))
-  //val wback_addrqueue_entry = Reg(new WriteAddrQueueEntry)
-  //val wback_dataqueue_entry = Reg(new WriteDataQueueEntry)
-  //val write_buf_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
-
-  val w_idole :: w_back :: w_new :: Nil = Enum(3)
-  val writebuf_wstage = RegInit(w_idole)
-  val readbuf_wstage = RegInit(w_idole)
-//request decode and reply
-  read_finish := (io.Request.valid === true.B) && (io.Request.bits.request_type === 0.U) && (io.Request.bits.others(1,0) === 0.U)
-  when(io.Request.bits.request_type === 3.U){
-    io.Request.ready := Mux(io.Request.bits.others(0) === 1.U, writebuf_wstage === w_idole, readbuf_wstage === w_idole)
-  }.otherwise{
-    io.Request.ready := true.B
-  }
-//axi link
-  io.rstage_axi <> readstage.io.axi
-  io.wstage_axi <> writestage.io.axi
-//read instructions
-  read_table.io.wen := io.Request.valid === true.B && io.Request.bits.request_type === 0.U(2.W) && (io.Request.bits.others(1,0) =/= 0.U)
-  read_table.io.wdata.option := 0.U
-  read_table.io.wdata.rtype := io.Request.bits.others(1,0)
-  read_table.io.wdata.raddr := io.Request.bits.others(29,2)
-  read_table.io.wdata.rsize := io.Request.bits.others(61,52)
-  read_table.io.wdata.rdata_ptr := io.Request.bits.others(39,31)
-  read_table.io.waddr := free_entry_ptr
-
-  when(io.Request.valid === true.B && io.Request.bits.request_type === 0.U(2.W) && (io.Request.bits.others(1,0) =/= 0.U)){
-    free_entry_ptr := free_entry_ptr + 1.U
-  } .otherwise{
-    free_entry_ptr := free_entry_ptr
+  read_table1.io.wen := read_type1 === true.B
+  read_table1.io.wdata.option := 0.U
+  read_table1.io.wdata.raddr := io.Request.bits.others(29,2)
+  read_table1.io.wdata.rsize := io.Request.bits.others(61,52)
+  read_table1.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+  read_table1.io.waddr := free_entry_ptr1
+  read_table1.io.raddr3 := io.CpuOperatePtr
+  when(read_type1 === true.B){
+    free_entry_ptr1 := free_entry_ptr1 + 1.U
   }
 
- /* when(io.Request.valid === true.B && io.Request.bits.request_type === 0.U(2.W) && (io.Request.bits.others(1,0) =/= 0.U)){
-    when(io.Request.bits.others(61,52) < (64 / 8).U){
-      read_buf_ptr := read_buf_ptr + 1.U
-    } .otherwise {
-      read_buf_ptr := read_buf_ptr + io.Request.bits.others(61, 52+log2Ceil(64 / 8)) //>> 6)
-    }
-  }*/
+  read_table1.io.wen := read_type2 === true.B
+  read_table2.io.wdata.option := 0.U
+  read_table2.io.wdata.raddr := io.Request.bits.others(29,2)
+  read_table2.io.wdata.rsize := io.Request.bits.others(61,52)
+  read_table2.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+  read_table2.io.waddr := free_entry_ptr2
+  read_table2.io.raddr3 := io.CpuOperatePtr
+  when(read_type2 === true.B){
+    free_entry_ptr2 := free_entry_ptr2 + 1.U
+  }
+
+  read_table1.io.wen := read_type3 === true.B
+  read_table3.io.wdata.option := 0.U
+  read_table3.io.wdata.raddr := io.Request.bits.others(29,2)
+  read_table3.io.wdata.rsize := io.Request.bits.others(61,52)
+  read_table3.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+  read_table3.io.waddr := free_entry_ptr3
+  read_table3.io.raddr3 := io.CpuOperatePtr
+  when(read_type3 === true.B){
+    free_entry_ptr3 := free_entry_ptr3 + 1.U
+  }
+  /* when(io.Request.valid === true.B && io.Request.bits.request_type === 0.U(2.W) && (io.Request.bits.others(1,0) =/= 0.U)){
+     when(io.Request.bits.others(61,52) < (64 / 8).U){
+       read_buf_ptr := read_buf_ptr + 1.U
+     } .otherwise {
+       read_buf_ptr := read_buf_ptr + io.Request.bits.others(61, 52+log2Ceil(64 / 8)) //>> 6)
+     }
+   }*/
 
   readstage.io.rdAddrEntry.valid := new_read_addr_ptr =/= free_entry_ptr
   read_table.io.raddr1 := new_read_addr_ptr
@@ -442,10 +595,44 @@ class HCPFController (params: HCPFParams)extends Module {
 
   read_table.io.raddr3 := cpu_operate_ptr
   io.cpuOperateEntry := read_table.io.rdata3
+}
 
-  when(read_finish === true.B){
-    cpu_operate_ptr := cpu_operate_ptr + 1.U
+class HCPFController (params: HCPFParams)extends Module {
+  val io = IO(new HCPFControllerBundle(params))
+
+
+  /*val free_entry_ptr1 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  val free_entry_ptr2 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  val free_entry_ptr3 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  val new_read_addr_ptr1 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  val new_read_addr_ptr2 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  val new_read_addr_ptr3 = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+  //val new_read_data_ptr = RegInit(0.U(log2Ceil(params.tableEntryNum).W))
+
+ // val read_buf_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
+  val read_table1 = Module(new ReadTable(params))
+  val read_table2 = Module(new ReadTable(params))
+  val read_table3 = Module(new ReadTable(params))*/
+
+  //val wback_addrqueue_entry = Reg(new WriteAddrQueueEntry)
+  //val wback_dataqueue_entry = Reg(new WriteDataQueueEntry)
+  //val write_buf_ptr = RegInit(0.U(log2Ceil(params.buffNum)))
+
+  val w_idole :: w_back :: w_new :: Nil = Enum(3)
+  val writebuf_wstage = RegInit(w_idole)
+  val readbuf_wstage = RegInit(w_idole)
+//request decode and reply
+
+  when(io.Request.bits.request_type === 3.U){
+    io.Request.ready := Mux(io.Request.bits.others(0) === 1.U, writebuf_wstage === w_idole, readbuf_wstage === w_idole)
+  }.otherwise{
+    io.Request.ready := true.B
   }
+//axi link
+
+
+//read instructions
+
 
   io.rdata_valid := cpu_operate_ptr === new_read_data_ptr
 //write read buffer instructions
@@ -475,53 +662,12 @@ class HCPFController (params: HCPFParams)extends Module {
     writebuf_wstage := w_idole
   }
 
-  when(read_finish === true.B && io.Request.bits.others(3,2) === 3.U && writebuf_wstage === w_idole){
-
-    writebuf_wsize := io.Request.bits.others(13,4)
-    wback_addrqueue_entry.waddr := read_table.io.rdata3.raddr
-    wback_addrqueue_entry.wsize := io.Request.bits.others(13,4)
-    wback_dataqueue_entry.wtype := 1.U(2.W)
-    wback_dataqueue_entry.wsize := io.Request.bits.others(13,4)
-    wback_dataqueue_entry.data := io.Request.bits.others(23,15)
-  }
-
-  when(writebuf_wstage === w_back){
-    writebuf_wcount := writebuf_wcount + (64 / 8).U
-  }.otherwise{
-    writebuf_wcount := 0.U
-  }
-
-  when(read_finish === true.B && io.Request.bits.others(3,2) === 3.U && writebuf_wstage === w_idole){
-    writebuf_waddr := read_table.io.rdata3.rdata_ptr//io.Request.bits.others(23,15)
-    writebuf_wdata_source_addr := read_table.io.rdata3.rdata_ptr
-  }.elsewhen(writebuf_wstage === w_back){
-    writebuf_waddr := writebuf_waddr + 1.U
-    writebuf_wdata_source_addr := writebuf_wdata_source_addr + 1.U
-  }
-
   io.rdbuf_raddr1 := writebuf_wdata_source_addr
   io.wtbuf_wdata.valid := writebuf_wstage === w_back || writebuf_wstage === w_new
   io.wtbuf_wdata.bits := Mux(writebuf_wstage === w_back, io.rdbuf_rdata1, io.Request.bits.others(32,1))
   io.wtbuf_waddr := Mux(readbuf_wstage === w_back, writebuf_waddr, io.Request.bits.others(42,34))
   io.wtbuf_wselect := Mux(readbuf_wstage === w_back, 3.U(2.W), Cat(io.Request.bits.others(33),~io.Request.bits.others(33)))
 //write confirm instructions
-  when(writebuf_wstage === w_back){
-    write_addr_queue.io.enq.bits := wback_addrqueue_entry
-    write_data_queue.io.enq.bits := wback_dataqueue_entry
-  }.otherwise{
-    write_addr_queue.io.enq.bits.waddr := io.Request.bits.others(27,0)
-    write_addr_queue.io.enq.bits.wsize := Mux(io.Request.bits.request_type === 1.U, io.Request.bits.others(61,52), io.Request.bits.others(61,60))
-    write_data_queue.io.enq.bits.data := Mux(io.Request.bits.request_type === 1.U, io.Request.bits.others(37,29), io.Request.bits.others(59,28))
-    write_data_queue.io.enq.bits.wsize := Mux(io.Request.bits.request_type === 1.U, io.Request.bits.others(61,52), io.Request.bits.others(61,60))
-    write_data_queue.io.enq.bits.wtype := io.Request.bits.request_type
-  }
-
-  write_addr_queue.io.enq.valid := (writebuf_wstage === w_back && writebuf_wcount === (writebuf_wsize - (64 / 8).U)) || (io.Request.valid && (io.Request.bits.request_type === 1.U || io.Request.bits.request_type === 2.U))
-  write_data_queue.io.enq.valid := (writebuf_wstage === w_back && writebuf_wcount === (writebuf_wsize - (64 / 8).U)) || (io.Request.valid && (io.Request.bits.request_type === 1.U || io.Request.bits.request_type === 2.U))
-  writestage.io.wtaddr <> write_addr_queue.io.deq
-  writestage.io.wtdata <> write_data_queue.io.deq
-  io.wtbuf_raddr1 := writestage.io.wtbuf_raddr1
-  writestage.io.wtbuf_rdata1 := io.wtbuf_rdata1
 }
 
 trait HCPFTLBundle extends Bundle {
@@ -663,7 +809,7 @@ trait HasPeripheryHCPF { this: BaseSubsystem =>
   private val portName = "hcpf"
 
   val hcpf = LazyModule(new PWMTL(
-    HCPFParams(address=address, beatBytes = pbus.beatBytes, buffNum=512, tableEntryNum=64, tableEntryBits=56))(p))
+    HCPFParams(address=address, beatBytes = pbus.beatBytes, buffNum=1024, tableEntryNum=64, tableEntryBits=56))(p))
 
   pbus.toVariableWidthSlave(Some(portName)) { hcpf.node }
 }
