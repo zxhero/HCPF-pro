@@ -165,14 +165,6 @@ module rocketchip_wrapper
   wire [5:0]  hcpf_AXI_rid;
   wire [63:0] hcpf_AXI_rdata;
   wire hcpf_AXI_rlast;
-    
-  assign hcpf_AXI_bready = 1'b1;
-  assign hcpf_AXI_arid = 6'd1;
-  assign hcpf_AXI_arsize = 3'd3;
-  assign hcpf_AXI_arburst = 2'd1;
-  assign hcpf_AXI_awid = 6'd1;
-  assign hcpf_AXI_awsize = 3'd3;
-  assign hcpf_AXI_awburst = 2'd1;
 
   system system_i
        (.DDR_addr(DDR_addr),
@@ -290,7 +282,7 @@ module rocketchip_wrapper
 		
         // slave AXI interface (fpga = master, zynq = slave) 
         // connected directly to DDR controller to handle test chip mem
-		.hcpf_S_AXI_araddr(hcpf_AXI_araddr),
+		.hcpf_S_AXI_araddr({4'd1,hcpf_AXI_araddr[27:0]}),
         .hcpf_S_AXI_arburst(hcpf_AXI_arburst),
         .hcpf_S_AXI_arcache('d0),
         .hcpf_S_AXI_arid(hcpf_AXI_arid),
@@ -303,7 +295,7 @@ module rocketchip_wrapper
         .hcpf_S_AXI_arsize(hcpf_AXI_arsize),
         .hcpf_S_AXI_arvalid(hcpf_AXI_arvalid),
         //
-        .hcpf_S_AXI_awaddr(hcpf_AXI_awaddr),
+        .hcpf_S_AXI_awaddr({4'd1,hcpf_AXI_awaddr[27:0]}),
         .hcpf_S_AXI_awburst(hcpf_AXI_awburst),
         .hcpf_S_AXI_awcache('d0),
         .hcpf_S_AXI_awid(hcpf_AXI_awid),
@@ -429,23 +421,47 @@ module rocketchip_wrapper
    .io_mem_axi_r_bits_data (S_AXI_rdata),
    .io_mem_axi_r_bits_last (S_AXI_rlast),
 
-   .hcpfout_aw_ready (hcpf_AXI_awready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_aw_valid (hcpf_AXI_awvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_aw_bits_addr (hcpf_AXI_awaddr), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_aw_bits_len (hcpf_AXI_awlen), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_w_ready (hcpf_AXI_wready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_w_valid (hcpf_AXI_wvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_w_bits_data (hcpf_AXI_wdata), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_w_bits_last (hcpf_AXI_wlast), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_ar_ready (hcpf_AXI_arready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_ar_valid (hcpf_AXI_arvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_ar_bits_addr (hcpf_AXI_araddr), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_ar_bits_len (hcpf_AXI_arlen), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_r_ready (hcpf_AXI_rready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_r_valid (hcpf_AXI_rvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_r_bits_data (hcpf_AXI_rdata), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .hcpfout_r_bits_last (hcpf_AXI_rlast)
-
+   .io_hcpf_axi_aw_ready (hcpf_AXI_awready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_aw_valid (hcpf_AXI_awvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_aw_bits_id (hcpf_AXI_awid),
+   .io_hcpf_axi_aw_bits_addr (hcpf_AXI_awaddr), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_aw_bits_len (hcpf_AXI_awlen), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_aw_bits_size (hcpf_AXI_awsize),
+   .io_hcpf_axi_aw_bits_burst (hcpf_AXI_awburst),
+   .io_hcpf_axi_aw_bits_lock (),
+   .io_hcpf_axi_aw_bits_cache (),
+   .io_hcpf_axi_aw_bits_prot (),
+   .io_hcpf_axi_aw_bits_qos (),
+   
+   .io_hcpf_axi_w_ready (hcpf_AXI_wready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_w_valid (hcpf_AXI_wvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_w_bits_data (hcpf_AXI_wdata), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_w_bits_strb (),
+   .io_hcpf_axi_w_bits_last (hcpf_AXI_wlast), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   
+   .io_hcpf_axi_b_ready (hcpf_AXI_bready),
+   .io_hcpf_axi_b_valid (hcpf_AXI_bvalid),
+   .io_hcpf_axi_b_bits_id ('d0),
+   .io_hcpf_axi_b_bits_resp (),
+   
+   .io_hcpf_axi_ar_ready (hcpf_AXI_arready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_ar_valid (hcpf_AXI_arvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_ar_bits_id (hcpf_AXI_arid),
+   .io_hcpf_axi_ar_bits_addr (hcpf_AXI_araddr), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_ar_bits_len (hcpf_AXI_arlen), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_ar_bits_size (hcpf_AXI_arsize),
+   .io_hcpf_axi_ar_bits_burst (hcpf_AXI_arburst),
+   .io_hcpf_axi_ar_bits_lock (),
+   .io_hcpf_axi_ar_bits_cache (),
+   .io_hcpf_axi_ar_bits_prot (),
+   .io_hcpf_axi_ar_bits_qos (),
+   
+   .io_hcpf_axi_r_ready (hcpf_AXI_rready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_r_valid (hcpf_AXI_rvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_r_bits_id (hcpf_AXI_rid),
+   .io_hcpf_axi_r_bits_data (hcpf_AXI_rdata), // @[:Top.ZynqFPGAConfig.fir@136622.4]
+   .io_hcpf_axi_r_bits_resp (),
+   .io_hcpf_axi_r_bits_last (hcpf_AXI_rlast)
   );
 `ifndef differential_clock
   IBUFG ibufg_gclk (.I(clk), .O(gclk_i));

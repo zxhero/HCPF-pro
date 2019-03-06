@@ -20,7 +20,7 @@ set script_folder [_tcl::get_script_folder]
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2016.2
+set scripts_vivado_version 2017.4
 set current_vivado_version [version -short]
 
 if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
@@ -189,7 +189,7 @@ CONFIG.RUSER_WIDTH {0} \
 CONFIG.SUPPORTS_NARROW_BURST {1} \
 CONFIG.WUSER_WIDTH {0} \
  ] $S_AXI
-  set hcpf_S_AXI [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 S_AXI ]
+  set hcpf_S_AXI [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:aximm_rtl:1.0 hcpf_S_AXI ]
   set_property -dict [ list \
 CONFIG.ADDR_WIDTH {32} \
 CONFIG.ARUSER_WIDTH {0} \
@@ -236,7 +236,7 @@ CONFIG.NUM_MI {1} \
  ] $axi_interconnect_1
 
   # Create instance: axi_interconnect_1, and set properties
-  set axi_interconnect_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_1 ]
+  set axi_interconnect_2 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_2 ]
   set_property -dict [ list \
 CONFIG.NUM_MI {1} \
  ] $axi_interconnect_2
