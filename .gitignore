@@ -9,6 +9,8 @@ common/project/target
 common/lib
 common/Makefrag.pkgs
 
+software/output/*
+
 zedboard/zedboard_rocketchip_*
 zedboard/src/tcl/zedboard_rocketchip_*.tcl
 zedboard/src/tcl/make_bitstream_*.tcl
