@@ -24,21 +24,18 @@ class Blkbuf(num : Int, w : Int) extends Module {
     val raddr1 = Input(UInt(log2Ceil(num).W))
     val raddr2 = Input(UInt(log2Ceil(num).W))
     val raddr3 = Input(UInt(log2Ceil(num).W))
+    val raddr4 = Input(UInt(log2Ceil(num).W))
+    val raddr5 = Input(UInt(log2Ceil(num).W))
     val select = Input(UInt(2.W))
     val rdata1 = Output(UInt(w.W))
     val rdata2 = Output(UInt(w.W))
     val rdata3 = Output(UInt(w.W))
+    val rdata4 = Output(UInt(w.W))
+    val rdata5 = Output(UInt(w.W))
   })
-  //val highbits = Wire(UInt((w/2).W))
-  //val lowbits = Wire(UInt(32.W))
-  //highbits := Mux(io.select === 3.U, io.wdata(w-1,w/2), io.wdata(w/2-1,0))
-  //lowbits := Mux(io.select === 3.U, io.wdata(w/2-1,0), io.wdata(w/2-1,0))
   val buf0 = Mem(num/2, UInt((w/2).W))
   val buf1 = Mem(num/2, UInt((w/2).W))
-  val dout1 = Wire(UInt(32.W))
-  val dout2 = Wire(UInt(32.W))
-  val dout5 = Wire(UInt(32.W))
-  //when(io.wen && io.select(1) === 1.U) { buf1(io.waddr) := highbits }
+
   when(io.wen === true.B){
     when(io.waddr(0) === 0.U){
       when(io.select(1) === 1.U){
@@ -57,28 +54,16 @@ class Blkbuf(num : Int, w : Int) extends Module {
       buf0(io.waddr(log2Ceil(num)-1,1)) := io.wdata(w-1,w/2)
     }
   }
-  when(io.raddr1(0) === 1.U){
-    dout1 := buf1(io.raddr1(log2Ceil(num)-1,1))
-  }.otherwise{
-    dout1 := buf1(io.raddr1(log2Ceil(num)-1,1))
-  }
-  when(io.raddr2(0) === 1.U){
-    dout2 := buf1(io.raddr2(log2Ceil(num)-1,1))
-  }.otherwise{
-    dout2 := buf1(io.raddr2(log2Ceil(num)-1,1))
-  }
-  when(io.raddr3(0) === 1.U){
-    dout5 := buf1(io.raddr3(log2Ceil(num)-1,1))
-  }.otherwise{
-    dout5 := buf1(io.raddr3(log2Ceil(num)-1,1))
-  }
-  //val buf0 = Mem(num, UInt((w/2).W))
-  /* when(io.wen && io.select(0) === 1.U) {
-     buf0(io.waddr) := io.wdata(w/2-1,0)
-   }*/
-  val dout3 = buf0(io.raddr1(log2Ceil(num)-1,1))
-  val dout4 = buf0(io.raddr2(log2Ceil(num)-1,1))
-  val dout6 = buf0(io.raddr3(log2Ceil(num)-1,1))
+  val  dout1 = buf1(io.raddr1(log2Ceil(num)-1,1))
+  val  dout2 = buf1(io.raddr2(log2Ceil(num)-1,1))
+  val  dout5 = buf1(io.raddr3(log2Ceil(num)-1,1))
+  val  dout7 = buf1(io.raddr4(log2Ceil(num)-1,1))
+  val dout9 = buf1(io.raddr5(log2Ceil(num)-1,1))
+  val dout3 = buf0((io.raddr1 + 1.U)(log2Ceil(num)-1,1))
+  val dout4 = buf0((io.raddr2 + 1.U)(log2Ceil(num)-1,1))
+  val dout6 = buf0((io.raddr3 + 1.U)(log2Ceil(num)-1,1))
+  val dout8 = buf0((io.raddr4 + 1.U)(log2Ceil(num) - 1,1))
+  val dout10 = buf0(io.raddr5(log2Ceil(num)-1,1))
   when(io.raddr1(0) === 1.U){
     io.rdata1 := Cat(dout3,dout1)
   }.otherwise{
@@ -95,6 +80,18 @@ class Blkbuf(num : Int, w : Int) extends Module {
     io.rdata3 := Cat(dout6,dout5)
   }.otherwise{
     io.rdata3 := Cat(dout5,dout6)
+  }
+
+  when(io.raddr4(0) === 1.U){
+    io.rdata4 := Cat(dout8,dout7)
+  }.otherwise{
+    io.rdata4 := Cat(dout7,dout8)
+  }
+
+  when(io.raddr5(0) === 1.U){
+    io.rdata5 := Cat(dout10,dout9)
+  }.otherwise{
+    io.rdata5 := Cat(dout9,dout10)
   }
 }
 
@@ -534,6 +531,8 @@ class HCPFType4ControllerBundle (params: HCPFParams) extends Bundle{
   val CpuOperatePtr = Input(UInt(log2Ceil(params.tableEntryNum).W))
   val CpuReadOffset = Input(UInt(log2Ceil(params.tableEntryNum).W))
   val CpuOperateEntry1 = Output(new ReadTableEntry)
+  val CpuOperateEntry2 = Output(new ReadTableEntry)
+  val CpuOperateEntry3 = Output(new ReadTableEntry)
   val CpuReadEntry1 = Output(new ReadTableEntry)
   val CpuReadEntry2 = Output(new ReadTableEntry)
   val CpuReadEntry3 = Output(new ReadTableEntry)
@@ -560,6 +559,8 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
   //instruction 1
   io.RStageAxi <> readstage.io.axi
   io.CpuOperateEntry1 := read_table1.io.rdata3
+  io.CpuOperateEntry2 := read_table2.io.rdata4
+  io.CpuOperateEntry3 := read_table3.io.rdata4
   io.CpuReadEntry1 := read_table1.io.rdata4
   io.CpuReadEntry2 := read_table2.io.rdata3
   io.CpuReadEntry3 := read_table3.io.rdata3
@@ -598,7 +599,7 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
   read_table2.io.raddr1 := readstage.io.rdTablePtr
   read_table2.io.raddr2 := new_read_addr_ptr2
   read_table2.io.raddr3 := io.CpuOperatePtr + io.CpuReadOffset
-  read_table2.io.raddr4 := io.CpuOperatePtr + io.CpuReadOffset
+  read_table2.io.raddr4 := io.CpuOperatePtr
   when(read_type2 === true.B){
     free_entry_ptr2 := free_entry_ptr2 + 1.U
   }
@@ -615,7 +616,7 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
   read_table3.io.raddr1 := readstage.io.rdTablePtr
   read_table3.io.raddr2 := new_read_addr_ptr3
   read_table3.io.raddr3 := io.CpuOperatePtr + io.CpuReadOffset
-  read_table3.io.raddr4 := io.CpuOperatePtr + io.CpuReadOffset
+  read_table3.io.raddr4 := io.CpuOperatePtr
   when(read_type3 === true.B){
     free_entry_ptr3 := free_entry_ptr3 + 1.U
   }
@@ -666,7 +667,9 @@ trait HCPFTLModule  extends HasRegMap {
   val controler3 = Module(new HCPFType3Controller(params))
   val controler4 = Module(new HCPFType4Controller(params))
   val read_offset1 = RegInit(0.U(64.W))
-  val read_data1 = Wire(UInt(64.W))
+  val read_data1 = Wire(UInt(128.W))
+  val read_offset23 = RegInit(0.U(64.W))
+  val read_data23 = Wire(UInt(128.W))
   /* val read_offset2 = RegInit(0.U(64.W))
    val read_data2 = Wire(UInt(64.W))
    val read_offset3 = RegInit(0.U(64.W))
@@ -735,7 +738,19 @@ trait HCPFTLModule  extends HasRegMap {
     read_BUFF.io.raddr2 := controler4.io.CpuReadEntry3.rdata_ptr + read_offset1(addr_bits-1,0)
     read_BUFF.io.raddr3 := controler4.io.CpuReadEntry3.rdata_ptr + read_offset1(31+addr_bits, 32)
   }
-  read_data1 := Cat(read_BUFF.io.rdata3(31,0), read_BUFF.io.rdata2(31,0))
+  read_data1 := Cat(read_BUFF.io.rdata3, read_BUFF.io.rdata2)
+
+  when(read_offset23(63,62) === 1.U(2.W)){
+    read_BUFF.io.raddr4 := controler4.io.CpuOperateEntry1.rdata_ptr + read_offset23(addr_bits-1,0)
+    read_BUFF.io.raddr5 := controler4.io.CpuOperateEntry1.rdata_ptr + read_offset23(31+addr_bits, 32)
+  }.elsewhen(read_offset23(63,62) === 2.U(2.W)){
+    read_BUFF.io.raddr4 := controler4.io.CpuOperateEntry2.rdata_ptr + read_offset23(addr_bits-1,0)
+    read_BUFF.io.raddr5 := controler4.io.CpuOperateEntry2.rdata_ptr + read_offset23(31+addr_bits, 32)
+  }.otherwise{
+    read_BUFF.io.raddr4 := controler4.io.CpuOperateEntry3.rdata_ptr + read_offset23(addr_bits-1,0)
+    read_BUFF.io.raddr5 := controler4.io.CpuOperateEntry3.rdata_ptr + read_offset23(31+addr_bits, 32)
+  }
+  read_data23 := Cat(read_BUFF.io.rdata5,read_BUFF.io.rdata4)
 
   when(controler3.io.RdBufWdata.valid === true.B){
     read_BUFF.io.waddr := controler3.io.RdBufWaddr
@@ -796,7 +811,19 @@ trait HCPFTLModule  extends HasRegMap {
     0x00 -> Seq(
       RegField.w(64, read_offset1)),
     0x8 -> Seq(
-      RegField.r(64,read_data1)
+      RegField.r(64,read_BUFF.io.rdata2)
+    ),
+    0x10 -> Seq(
+      RegField.r(64,read_BUFF.io.rdata3)
+    ),
+    0x18 -> Seq(
+      RegField.w(64,read_offset23)
+    ),
+    0x20 -> Seq(
+      RegField.r(64,read_BUFF.io.rdata4)
+    ),
+    0x28 -> Seq(
+      RegField.r(64,read_BUFF.io.rdata5 )
     ),
     0x30 -> Seq(
       RegField.w(64,RWrequest)
