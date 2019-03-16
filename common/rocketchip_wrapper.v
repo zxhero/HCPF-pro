@@ -156,6 +156,7 @@ module rocketchip_wrapper
   wire hcpf_AXI_wvalid;
   wire [63:0] hcpf_AXI_wdata;
   wire hcpf_AXI_wlast;
+  wire [7:0] hcpf_AXI_wstrb;
 
   wire hcpf_AXI_bready;
   wire hcpf_AXI_bvalid;
@@ -323,7 +324,7 @@ module rocketchip_wrapper
         .hcpf_S_AXI_wdata(hcpf_AXI_wdata),
         .hcpf_S_AXI_wlast(hcpf_AXI_wlast),
         .hcpf_S_AXI_wready(hcpf_AXI_wready),
-        .hcpf_S_AXI_wstrb('d0),
+        .hcpf_S_AXI_wstrb(hcpf_AXI_wstrb),
         .hcpf_S_AXI_wvalid(hcpf_AXI_wvalid),
         .ext_clk_in(host_clk)
         );
@@ -436,7 +437,7 @@ module rocketchip_wrapper
    .io_hcpf_axi_w_ready (hcpf_AXI_wready), // @[:Top.ZynqFPGAConfig.fir@136622.4]
    .io_hcpf_axi_w_valid (hcpf_AXI_wvalid), // @[:Top.ZynqFPGAConfig.fir@136622.4]
    .io_hcpf_axi_w_bits_data (hcpf_AXI_wdata), // @[:Top.ZynqFPGAConfig.fir@136622.4]
-   .io_hcpf_axi_w_bits_strb (),
+   .io_hcpf_axi_w_bits_strb (hcpf_AXI_wstrb),
    .io_hcpf_axi_w_bits_last (hcpf_AXI_wlast), // @[:Top.ZynqFPGAConfig.fir@136622.4]
    
    .io_hcpf_axi_b_ready (hcpf_AXI_bready),
