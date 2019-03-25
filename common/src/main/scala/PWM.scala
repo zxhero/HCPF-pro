@@ -416,9 +416,9 @@ class HCPFType1ControllerBundle (params: HCPFParams) extends Bundle{
 class HCPFType1Controller (params: HCPFParams) extends  Module{
     val io = IO(new HCPFType1ControllerBundle(params))
     val writestage = Module(new WriteStage(params))
-    val write_addr_queue = Module(new Queue(new WriteAddrQueueEntry, 128))
-    val write_data_queue = Module(new Queue(new WriteDataQueueEntry,128))
-    val request_queue = Module(new Queue(new RWRequest, entries = 128))
+    val write_addr_queue = Module(new Queue(new WriteAddrQueueEntry, 64))
+    val write_data_queue = Module(new Queue(new WriteDataQueueEntry,64))
+    val request_queue = Module(new Queue(new RWRequest, entries = 64))
 
     request_queue.io.enq <> io.Request
     io.RequestQueueEmpty := (request_queue.io.count === 0.U)
@@ -490,7 +490,7 @@ class HCPFType3Controller (params: HCPFParams) extends  Module{
     val writebuf_wptr = RegInit(0.U(log2Ceil(params.buffNum).W))
     val writebuf_wdata_source_ptr = RegInit(0.U(log2Ceil(params.buffNum).W))
     val writebuf_wcount = RegInit(0.U(log2Ceil(params.buffNum).W))
-    val request_queue = Module(new Queue(new RWRequest, entries = 128))
+    val request_queue = Module(new Queue(new RWRequest, entries = 64))
     val idole :: busy :: Nil = Enum(2)
     val wdata_state = RegInit(idole)
     val send_request_state = RegInit(idole)
@@ -1016,7 +1016,7 @@ trait HasPeripheryHCPF { this: BaseSubsystem =>
     val hcpf = LazyModule(new PWMTL(
         HCPFParams(address=address, beatBytes = pbus.beatBytes, buffNum=1024, tableEntryNum=64, tableEntryBits=56))(p))
 
-    pbus.toVariableWidthSlave(Some(portName)) { hcpf.node }
+    sbus.toVariableWidthSlave(Some(portName),buffer = BufferParams.none) { hcpf.node }
 }
 
 trait HasPeripheryHCPFModuleImp extends LazyModuleImp {

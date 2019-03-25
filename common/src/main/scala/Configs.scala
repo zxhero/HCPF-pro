@@ -1,13 +1,13 @@
 package zynq
 
 import chisel3._
-import freechips.rocketchip.config.{Parameters, Config}
+import freechips.rocketchip.config.{Config, Parameters}
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.tilelink.BootROMParams
-import freechips.rocketchip.rocket.{RocketCoreParams, MulDivParams, DCacheParams, ICacheParams}
-import freechips.rocketchip.tile.{RocketTileParams, BuildCore, XLen}
-import freechips.rocketchip.diplomacy.{LazyModule, ValName}
+import freechips.rocketchip.rocket.{DCacheParams, ICacheParams, MulDivParams, RocketCoreParams}
+import freechips.rocketchip.tile.{BuildCore, RocketTileParams, XLen}
 import testchipip._
+import freechips.rocketchip.diplomacy._
 
 class WithBootROM extends Config((site, here, up) => {
   case BootROMParams => BootROMParams(
@@ -47,6 +47,47 @@ class WithNMediumCores(n: Int) extends Config((site, here, up) => {
   }
 })
 
+class AsynBusConfig extends Config(new BaseSubsystemConfig().alter((site,here,up) => {
+  // DTS descriptive parameters
+  case DTSModel => "freechips,rocketchip-unknown"
+  case DTSCompat => Nil
+  case DTSTimebase => BigInt(1000000) // 1 MHz
+  // External port parameters
+  case NExtTopInterrupts => 2
+  case ExtMem => MasterPortParams(
+    base = x"8000_0000",
+    size = x"1000_0000",
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4)
+  case ExtBus => MasterPortParams(
+    base = x"6000_0000",
+    size = x"2000_0000",
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4)
+  case PeripheryBusKey => PeripheryBusParams(beatBytes = site(XLen)/8, blockBytes = site(CacheBlockBytes), sbusCrossingType = AsynchronousCrossing(depth = 32))
+  case ExtIn  => SlavePortParams(beatBytes = 8, idBits = 8, sourceBits = 4)
+}))
+
+class DeepPBusConfig extends Config(new BaseSubsystemConfig().alter((site,here,up) => {
+  // DTS descriptive parameters
+  case DTSModel => "freechips,rocketchip-unknown"
+  case DTSCompat => Nil
+  case DTSTimebase => BigInt(1000000) // 1 MHz
+  // External port parameters
+  case NExtTopInterrupts => 2
+  case ExtMem => MasterPortParams(
+    base = x"8000_0000",
+    size = x"1000_0000",
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4)
+  case ExtBus => MasterPortParams(
+    base = x"6000_0000",
+    size = x"2000_0000",
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4)
+  case PeripheryBusKey => PeripheryBusParams(beatBytes = site(XLen)/8, blockBytes = site(CacheBlockBytes), bufferAtomics = BufferParams(32))
+  case ExtIn  => SlavePortParams(beatBytes = 8, idBits = 8, sourceBits = 4)
+}))
 //class WithPWM extends Config((site, here, up) => {})
 
 class DefaultConfig extends Config(
@@ -56,13 +97,22 @@ class DefaultMediumConfig extends Config(
   new freechips.rocketchip.system.BaseConfig)
 class DefaultSmallConfig extends Config(
   new WithBootROM ++ new freechips.rocketchip.system.DefaultSmallConfig)
+class AsynConfig extends Config(
+  new WithBootROM ++ new freechips.rocketchip.subsystem.WithNBigCores(1) ++ new AsynBusConfig
+)
+class DeepPbusConfig extends Config(
+  new WithBootROM ++ new freechips.rocketchip.subsystem.WithNBigCores(1) ++ new DeepPBusConfig
+)
 
 class ZynqConfig extends Config(new WithZynqAdapter ++ new DefaultConfig)
 class ZynqMediumConfig extends Config(new WithZynqAdapter ++ new DefaultMediumConfig)
 class ZynqSmallConfig extends Config(new WithZynqAdapter ++ new DefaultSmallConfig)
+class ZynqAsynConfig extends Config(new WithZynqAdapter ++ new AsynConfig)
+class ZynqDeepPbusConfig extends Config(new WithZynqAdapter ++ new DeepPbusConfig)
 
 class ZynqFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqConfig)
 class ZynqMediumFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqMediumConfig)
 class ZynqSmallFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqSmallConfig)
-
+class ZynqAsynFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqAsynConfig)
+class ZynqDeepPbusFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqDeepPbusConfig)
 //class ZynqFPGAHCPFConfig extends Config(new WithoutTLMonitors ++ new ZynqConfig ++ WithPWM)
