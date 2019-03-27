@@ -1,6 +1,5 @@
 *.log
 *.jou
-*.Xil
 *.swp
 
 common/build
@@ -31,7 +30,7 @@ zybo/src/verilog/plusarg_reader.v
 zybo/deliver_output
 zybo/soft_build
 
-zc706/zc706_rocketchip_*
+zc706/zc706_rocketchip_zc706_rocketchip_ZynqFPGAConfig/*
 zc706/src/tcl/zc706_rocketchip_*.tcl
 zc706/src/tcl/make_bitstream_*.tcl
 zc706/src/verilog/rocketchip_wrapper.v
