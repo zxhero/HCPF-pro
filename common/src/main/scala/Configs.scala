@@ -90,6 +90,44 @@ class DeepPBusConfig extends Config(new BaseSubsystemConfig().alter((site,here,u
 }))
 //class WithPWM extends Config((site, here, up) => {})
 
+class ExperimentConfig extends Config(new BaseSubsystemConfig().alter((site,here,up) => {
+  // DTS descriptive parameters
+  case DTSModel => "freechips,rocketchip-unknown"
+  case DTSCompat => Nil
+  case DTSTimebase => BigInt(1000000) // 1 MHz
+  // External port parameters
+  case NExtTopInterrupts => 2
+  case ExtMem => MasterPortParams(
+    base = x"8000_0000",
+    size = x"3000_0000",
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4)
+  case ExtBus => MasterPortParams(
+    base = x"6000_0000",
+    size = x"2000_0000",
+    beatBytes = site(MemoryBusKey).beatBytes,
+    idBits = 4)
+  case ExtIn  => SlavePortParams(beatBytes = 8, idBits = 8, sourceBits = 4)
+}))
+
+class WithNBigCoresNMSHR(n: Int) extends Config((site, here, up) => {
+  case RocketTilesKey => {
+    val big = RocketTileParams(
+      core   = RocketCoreParams(mulDiv = Some(MulDivParams(
+        mulUnroll = 8,
+        mulEarlyOut = true,
+        divEarlyOut = true))),
+      dcache = Some(DCacheParams(
+        rowBits = site(SystemBusKey).beatBits,
+        nMSHRs = 4,
+        blockBytes = site(CacheBlockBytes))),
+      icache = Some(ICacheParams(
+        rowBits = site(SystemBusKey).beatBits,
+        blockBytes = site(CacheBlockBytes))))
+    List.tabulate(n)(i => big.copy(hartId = i))
+  }
+})
+
 class DefaultConfig extends Config(
   new WithBootROM ++ new freechips.rocketchip.system.DefaultConfig)
 class DefaultMediumConfig extends Config(
@@ -103,16 +141,21 @@ class AsynConfig extends Config(
 class DeepPbusConfig extends Config(
   new WithBootROM ++ new freechips.rocketchip.subsystem.WithNBigCores(1) ++ new DeepPBusConfig
 )
+class HCPFConfig extends Config(
+  new WithBootROM ++ new WithNBigCoresNMSHR(1) ++ new ExperimentConfig
+)
 
 class ZynqConfig extends Config(new WithZynqAdapter ++ new DefaultConfig)
 class ZynqMediumConfig extends Config(new WithZynqAdapter ++ new DefaultMediumConfig)
 class ZynqSmallConfig extends Config(new WithZynqAdapter ++ new DefaultSmallConfig)
 class ZynqAsynConfig extends Config(new WithZynqAdapter ++ new AsynConfig)
 class ZynqDeepPbusConfig extends Config(new WithZynqAdapter ++ new DeepPbusConfig)
+class ZynqHCPFConfig extends Config(new WithZynqAdapter ++ new HCPFConfig )
 
 class ZynqFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqConfig)
 class ZynqMediumFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqMediumConfig)
 class ZynqSmallFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqSmallConfig)
 class ZynqAsynFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqAsynConfig)
 class ZynqDeepPbusFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqDeepPbusConfig)
+class ZynqHCPFFPGAConfig extends Config(new WithoutTLMonitors ++ new ZynqHCPFConfig)
 //class ZynqFPGAHCPFConfig extends Config(new WithoutTLMonitors ++ new ZynqConfig ++ WithPWM)

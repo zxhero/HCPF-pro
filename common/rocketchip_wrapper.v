@@ -2,65 +2,184 @@
 `include "clocking.vh"
 
 module rocketchip_wrapper
-   (DDR_addr,
-    DDR_ba,
-    DDR_cas_n,
-    DDR_ck_n,
-    DDR_ck_p,
-    DDR_cke,
-    DDR_cs_n,
-    DDR_dm,
-    DDR_dq,
-    DDR_dqs_n,
-    DDR_dqs_p,
-    DDR_odt,
-    DDR_ras_n,
-    DDR_reset_n,
-    DDR_we_n,
-    FIXED_IO_ddr_vrn,
-    FIXED_IO_ddr_vrp,
-    FIXED_IO_mio,
-    FIXED_IO_ps_clk,
-    FIXED_IO_ps_porb,
-    FIXED_IO_ps_srstb,
-`ifndef differential_clock
-    clk);
-`else
-    SYSCLK_P,
-    SYSCLK_N);
-`endif
+   (
+   inout [14:0]DDR_addr,
+  inout [2:0]DDR_ba,
+  inout DDR_cas_n,
+  inout DDR_ck_n,
+  inout DDR_ck_p,
+  inout DDR_cke,
+  inout DDR_cs_n,
+  inout [3:0]DDR_dm,
+  inout [31:0]DDR_dq,
+  inout [3:0]DDR_dqs_n,
+  inout [3:0]DDR_dqs_p,
+  inout DDR_odt,
+  inout DDR_ras_n,
+  inout DDR_reset_n,
+  inout DDR_we_n,
 
-  inout [14:0]DDR_addr;
-  inout [2:0]DDR_ba;
-  inout DDR_cas_n;
-  inout DDR_ck_n;
-  inout DDR_ck_p;
-  inout DDR_cke;
-  inout DDR_cs_n;
-  inout [3:0]DDR_dm;
-  inout [31:0]DDR_dq;
-  inout [3:0]DDR_dqs_n;
-  inout [3:0]DDR_dqs_p;
-  inout DDR_odt;
-  inout DDR_ras_n;
-  inout DDR_reset_n;
-  inout DDR_we_n;
-
-  inout FIXED_IO_ddr_vrn;
-  inout FIXED_IO_ddr_vrp;
-  inout [53:0]FIXED_IO_mio;
-  inout FIXED_IO_ps_clk;
-  inout FIXED_IO_ps_porb;
-  inout FIXED_IO_ps_srstb;
-
-`ifndef differential_clock
-  input clk;
-`else
-  input SYSCLK_P;
-  input SYSCLK_N;
-`endif
-
-  wire FCLK_RESET0_N;
+  inout FIXED_IO_ddr_vrn,
+  inout FIXED_IO_ddr_vrp,
+  inout [53:0]FIXED_IO_mio,
+  inout FIXED_IO_ps_clk,
+  inout FIXED_IO_ps_porb,
+  inout FIXED_IO_ps_srstb,
+	
+	output [31:0]hcpf_M_AXI_araddr,
+	output [1:0]hcpf_M_AXI_arburst,
+	output [3:0]hcpf_M_AXI_arcache,
+	output [5:0]hcpf_M_AXI_arid,
+	output [7:0]hcpf_M_AXI_arlen,
+	output [0:0]hcpf_M_AXI_arlock,
+	output [2:0]hcpf_M_AXI_arprot,
+	output [3:0]hcpf_M_AXI_arqos,
+	input [0:0]hcpf_M_AXI_arready,
+	output [3:0]hcpf_M_AXI_arregion,
+	output [2:0]hcpf_M_AXI_arsize,
+	output [0:0]hcpf_M_AXI_arvalid,
+	output [31:0]hcpf_M_AXI_awaddr,
+	output [1:0]hcpf_M_AXI_awburst,
+	output [3:0]hcpf_M_AXI_awcache,
+	output [5:0]hcpf_M_AXI_awid,
+	output [7:0]hcpf_M_AXI_awlen,
+	output [0:0]hcpf_M_AXI_awlock,
+	output [2:0]hcpf_M_AXI_awprot,
+	output [3:0]hcpf_M_AXI_awqos,
+	input [0:0]hcpf_M_AXI_awready,
+	output [3:0]hcpf_M_AXI_awregion,
+	output [2:0]hcpf_M_AXI_awsize,
+	output [0:0]hcpf_M_AXI_awvalid,
+	input [5:0]hcpf_M_AXI_bid,
+	output [0:0]hcpf_M_AXI_bready,
+	input [1:0]hcpf_M_AXI_bresp,
+	input [0:0]hcpf_M_AXI_bvalid,
+	input [63:0]hcpf_M_AXI_rdata,
+	input [5:0]hcpf_M_AXI_rid,
+	input [0:0]hcpf_M_AXI_rlast,
+	output [0:0]hcpf_M_AXI_rready,
+	input [1:0]hcpf_M_AXI_rresp,
+	input [0:0]hcpf_M_AXI_rvalid,
+	output [63:0]hcpf_M_AXI_wdata,
+	output [0:0]hcpf_M_AXI_wlast,
+	input [0:0]hcpf_M_AXI_wready,
+	output [7:0]hcpf_M_AXI_wstrb,
+	output [0:0]hcpf_M_AXI_wvalid,
+	
+	output [31:0]mbus_M_AXI_araddr,
+	output [1:0]mbus_M_AXI_arburst,
+	output [3:0]mbus_M_AXI_arcache,
+	output [5:0]mbus_M_AXI_arid,
+	output [7:0]mbus_M_AXI_arlen,
+	output [0:0]mbus_M_AXI_arlock,
+	output [2:0]mbus_M_AXI_arprot,
+	output [3:0]mbus_M_AXI_arqos,
+	input [0:0]mbus_M_AXI_arready,
+	output [3:0]mbus_M_AXI_arregion,
+	output [2:0]mbus_M_AXI_arsize,
+	output [0:0]mbus_M_AXI_arvalid,
+	output [31:0]mbus_M_AXI_awaddr,
+	output [1:0]mbus_M_AXI_awburst,
+	output [3:0]mbus_M_AXI_awcache,
+	output [5:0]mbus_M_AXI_awid,
+	output [7:0]mbus_M_AXI_awlen,
+	output [0:0]mbus_M_AXI_awlock,
+	output [2:0]mbus_M_AXI_awprot,
+	output [3:0]mbus_M_AXI_awqos,
+	input [0:0]mbus_M_AXI_awready,
+	output [3:0]mbus_M_AXI_awregion,
+	output [2:0]mbus_M_AXI_awsize,
+	output [0:0]mbus_M_AXI_awvalid,
+	input [5:0]mbus_M_AXI_bid,
+	output [0:0]mbus_M_AXI_bready,
+	input [1:0]mbus_M_AXI_bresp,
+	input [0:0]mbus_M_AXI_bvalid,
+	input [63:0]mbus_M_AXI_rdata,
+	input [5:0]mbus_M_AXI_rid,
+	input [0:0]mbus_M_AXI_rlast,
+	output [0:0]mbus_M_AXI_rready,
+	input [1:0]mbus_M_AXI_rresp,
+	input [0:0]mbus_M_AXI_rvalid,
+	output [63:0]mbus_M_AXI_wdata,
+	output [0:0]mbus_M_AXI_wlast,
+	input [0:0]mbus_M_AXI_wready,
+	output [7:0]mbus_M_AXI_wstrb,
+	output [0:0]mbus_M_AXI_wvalid,
+  
+	output [31:0]tile_M_AXI_araddr,
+	output [1:0]tile_M_AXI_arburst,
+	output [3:0]tile_M_AXI_arcache,
+	output [6:0]tile_M_AXI_arid,
+	output [7:0]tile_M_AXI_arlen,
+	output [0:0]tile_M_AXI_arlock,
+	output [2:0]tile_M_AXI_arprot,
+	output [3:0]tile_M_AXI_arqos,
+	input [0:0]tile_M_AXI_arready,
+	output [3:0]tile_M_AXI_arregion,
+	output [2:0]tile_M_AXI_arsize,
+	output [0:0]tile_M_AXI_arvalid,
+	output [31:0]tile_M_AXI_awaddr,
+	output [1:0]tile_M_AXI_awburst,
+	output [3:0]tile_M_AXI_awcache,
+	output [6:0]tile_M_AXI_awid,
+	output [7:0]tile_M_AXI_awlen,
+	output [0:0]tile_M_AXI_awlock,
+	output [2:0]tile_M_AXI_awprot,
+	output [3:0]tile_M_AXI_awqos,
+	input [0:0]tile_M_AXI_awready,
+	output [3:0]tile_M_AXI_awregion,
+	output [2:0]tile_M_AXI_awsize,
+	output [0:0]tile_M_AXI_awvalid,
+	input [6:0]tile_M_AXI_bid,
+	output [0:0]tile_M_AXI_bready,
+	input [1:0]tile_M_AXI_bresp,
+	input [0:0]tile_M_AXI_bvalid,
+	input [63:0]tile_M_AXI_rdata,
+	input [6:0]tile_M_AXI_rid,
+	input [0:0]tile_M_AXI_rlast,
+	output [0:0]tile_M_AXI_rready,
+	input [1:0]tile_M_AXI_rresp,
+	input [0:0]tile_M_AXI_rvalid,
+	output [63:0]tile_M_AXI_wdata,
+	output [0:0]tile_M_AXI_wlast,
+	input [0:0]tile_M_AXI_wready,
+	output [7:0]tile_M_AXI_wstrb,
+	output [0:0]tile_M_AXI_wvalid,
+	
+	input         io_mmio_axi_aw_ready, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output        io_mmio_axi_aw_valid, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output [30:0] io_mmio_axi_aw_bits_addr, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input         io_mmio_axi_w_ready, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output        io_mmio_axi_w_valid, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output [63:0] io_mmio_axi_w_bits_data, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output [7:0]  io_mmio_axi_w_bits_strb, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output        io_mmio_axi_b_ready, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input         io_mmio_axi_b_valid, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input  [1:0]  io_mmio_axi_b_bits_resp, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input         io_mmio_axi_ar_ready, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output        io_mmio_axi_ar_valid, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output [30:0] io_mmio_axi_ar_bits_addr, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	output        io_mmio_axi_r_ready, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input         io_mmio_axi_r_valid, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input  [63:0] io_mmio_axi_r_bits_data, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	input  [1:0]  io_mmio_axi_r_bits_resp, // @[:Top.ZynqFPGAConfig.fir@183370.4]
+	
+	input		mcb_clk,
+	input		mig_ic_resetn,
+	output		tile_aresetn,
+	output		host_clk,
+	output		FCLK_RESET0_N,
+	output      debug_inf,
+	output      debug_inf_1,
+	output      debug_inf_2
+	//input		dcm_locked
+	);
+//`ifndef differential_clock
+//    input clk);
+//`else
+    //input SYSCLK_P,
+    //input gclk_i);
+//`endif
   
   wire [31:0]M_AXI_araddr;
   wire [1:0]M_AXI_arburst;
@@ -133,8 +252,8 @@ module rocketchip_wrapper
   wire S_AXI_rlast;
 
   wire reset, reset_cpu;
-  wire host_clk;
-  wire gclk_i, gclk_fbout, host_clk_i, mmcm_locked;
+  
+  wire  FCLK_CLK,gclk_fbout, host_clk_i, mmcm_locked;
 
   wire hcpf_AXI_arready;
   wire hcpf_AXI_arvalid;
@@ -166,7 +285,13 @@ module rocketchip_wrapper
   wire [5:0]  hcpf_AXI_rid;
   wire [63:0] hcpf_AXI_rdata;
   wire hcpf_AXI_rlast;
-
+  
+  wire [31:0] mem_araddr;
+  wire [31:0] mem_awaddr;
+  
+ assign debug_inf = S_AXI_araddr[31:28] == 4'd1;//tile_aresetn;//S_AXI_arready;
+ assign debug_inf_1 = mem_araddr[31:28] == 4'd8;//S_AXI_arready;//io_mmio_axi_ar_ready;
+ //assign debug_inf_2 = hcpf_M_AXI_arready;
   system system_i
        (.DDR_addr(DDR_addr),
         .DDR_ba(DDR_ba),
@@ -246,7 +371,7 @@ module rocketchip_wrapper
         .S_AXI_arprot(S_AXI_arprot),
         .S_AXI_arqos(S_AXI_arqos),
         .S_AXI_arready(S_AXI_arready),
-        .S_AXI_arregion(4'b0),
+      //  .S_AXI_arregion(4'b0),
         .S_AXI_arsize(S_AXI_arsize),
         .S_AXI_arvalid(S_AXI_arvalid),
         //
@@ -259,7 +384,7 @@ module rocketchip_wrapper
         .S_AXI_awprot(S_AXI_awprot),
         .S_AXI_awqos(S_AXI_awqos),
         .S_AXI_awready(S_AXI_awready),
-        .S_AXI_awregion(4'b0),
+        //.S_AXI_awregion(4'b0),
         .S_AXI_awsize(S_AXI_awsize),
         .S_AXI_awvalid(S_AXI_awvalid),
         //
@@ -283,7 +408,7 @@ module rocketchip_wrapper
 		
         // slave AXI interface (fpga = master, zynq = slave) 
         // connected directly to DDR controller to handle test chip mem
-		.hcpf_S_AXI_araddr({4'd1,hcpf_AXI_araddr[27:0]}),
+		.hcpf_S_AXI_araddr({2'd0,hcpf_AXI_araddr[27:0],2'd0}),
         .hcpf_S_AXI_arburst(hcpf_AXI_arburst),
         .hcpf_S_AXI_arcache('d0),
         .hcpf_S_AXI_arid(hcpf_AXI_arid),
@@ -292,11 +417,11 @@ module rocketchip_wrapper
         .hcpf_S_AXI_arprot('d0),
         .hcpf_S_AXI_arqos('d0),
         .hcpf_S_AXI_arready(hcpf_AXI_arready),
-        .hcpf_S_AXI_arregion(4'b0),
+        //.hcpf_S_AXI_arregion(4'b0),
         .hcpf_S_AXI_arsize(hcpf_AXI_arsize),
         .hcpf_S_AXI_arvalid(hcpf_AXI_arvalid),
         //
-        .hcpf_S_AXI_awaddr({4'd1,hcpf_AXI_awaddr[27:0]}),
+        .hcpf_S_AXI_awaddr({2'd0,hcpf_AXI_awaddr[27:0],2'd0}),
         .hcpf_S_AXI_awburst(hcpf_AXI_awburst),
         .hcpf_S_AXI_awcache('d0),
         .hcpf_S_AXI_awid(hcpf_AXI_awid),
@@ -305,7 +430,7 @@ module rocketchip_wrapper
         .hcpf_S_AXI_awprot('d0),
         .hcpf_S_AXI_awqos('d0),
         .hcpf_S_AXI_awready(hcpf_AXI_awready),
-        .hcpf_S_AXI_awregion(4'b0),
+        //.hcpf_S_AXI_awregion(4'b0),
         .hcpf_S_AXI_awsize(hcpf_AXI_awsize),
         .hcpf_S_AXI_awvalid(hcpf_AXI_awvalid),
         //
@@ -326,17 +451,149 @@ module rocketchip_wrapper
         .hcpf_S_AXI_wready(hcpf_AXI_wready),
         .hcpf_S_AXI_wstrb(hcpf_AXI_wstrb),
         .hcpf_S_AXI_wvalid(hcpf_AXI_wvalid),
-        .ext_clk_in(host_clk)
+        .ext_clk_in(host_clk),
+		.mcb_clk(mcb_clk),
+		.mig_ic_resetn(mig_ic_resetn),
+		.tile_aresetn(tile_aresetn),
+		//.dcm_locked_0(dcm_locked),
+		.FCLK_CLK0_0			(FCLK_CLK),
+		//.debug_inf_1              (debug_inf_1),
+		//.debug_inf_2              (debug_inf_2),
+		//.debug_inf                (debug_inf),
+		.S00_AXI_arready_0           (debug_inf_2),
+        //connect to PL DDR
+		.hcpf_M_AXI_araddr		(hcpf_M_AXI_araddr),
+		.hcpf_M_AXI_arburst		(hcpf_M_AXI_arburst),
+		.hcpf_M_AXI_arcache		(hcpf_M_AXI_arcache),
+		.hcpf_M_AXI_arid		(hcpf_M_AXI_arid),
+		.hcpf_M_AXI_arlen		(hcpf_M_AXI_arlen),
+		.hcpf_M_AXI_arlock		(hcpf_M_AXI_arlock),
+		.hcpf_M_AXI_arprot		(hcpf_M_AXI_arprot),
+		.hcpf_M_AXI_arqos		(hcpf_M_AXI_arqos),
+		.hcpf_M_AXI_arready		(hcpf_M_AXI_arready),
+		.hcpf_M_AXI_arregion	(hcpf_M_AXI_arregion),
+		.hcpf_M_AXI_arsize		(hcpf_M_AXI_arsize),
+		.hcpf_M_AXI_arvalid		(hcpf_M_AXI_arvalid),
+		.hcpf_M_AXI_awaddr		(hcpf_M_AXI_awaddr),
+		.hcpf_M_AXI_awburst		(hcpf_M_AXI_awburst),
+		.hcpf_M_AXI_awcache		(hcpf_M_AXI_awcache),
+		.hcpf_M_AXI_awid		(hcpf_M_AXI_awid),
+		.hcpf_M_AXI_awlen		(hcpf_M_AXI_awlen),
+		.hcpf_M_AXI_awlock		(hcpf_M_AXI_awlock),
+		.hcpf_M_AXI_awprot		(hcpf_M_AXI_awprot),
+		.hcpf_M_AXI_awqos		(hcpf_M_AXI_awqos),
+		.hcpf_M_AXI_awready		(hcpf_M_AXI_awready),
+		.hcpf_M_AXI_awregion	(hcpf_M_AXI_awregion),
+		.hcpf_M_AXI_awsize		(hcpf_M_AXI_awsize),
+		.hcpf_M_AXI_awvalid		(hcpf_M_AXI_awvalid),
+		.hcpf_M_AXI_bid			(hcpf_M_AXI_bid),
+		.hcpf_M_AXI_bready		(hcpf_M_AXI_bready),
+		.hcpf_M_AXI_bresp		(hcpf_M_AXI_bresp),
+		.hcpf_M_AXI_bvalid		(hcpf_M_AXI_bvalid),
+		.hcpf_M_AXI_rdata		(hcpf_M_AXI_rdata),
+		.hcpf_M_AXI_rid			(hcpf_M_AXI_rid),
+		.hcpf_M_AXI_rlast		(hcpf_M_AXI_rlast),
+		.hcpf_M_AXI_rready		(hcpf_M_AXI_rready),
+		.hcpf_M_AXI_rresp		(hcpf_M_AXI_rresp),
+		.hcpf_M_AXI_rvalid		(hcpf_M_AXI_rvalid),
+		.hcpf_M_AXI_wdata		(hcpf_M_AXI_wdata),
+		.hcpf_M_AXI_wlast		(hcpf_M_AXI_wlast),
+		.hcpf_M_AXI_wready		(hcpf_M_AXI_wready),
+		.hcpf_M_AXI_wstrb		(hcpf_M_AXI_wstrb),
+		.hcpf_M_AXI_wvalid		(hcpf_M_AXI_wvalid),
+	   //connect to PL DDR
+		.mbus_M_AXI_araddr		(mbus_M_AXI_araddr),
+		.mbus_M_AXI_arburst		(mbus_M_AXI_arburst),
+		.mbus_M_AXI_arcache		(mbus_M_AXI_arcache),
+		.mbus_M_AXI_arid		(mbus_M_AXI_arid),
+		.mbus_M_AXI_arlen		(mbus_M_AXI_arlen),
+		.mbus_M_AXI_arlock		(mbus_M_AXI_arlock),
+		.mbus_M_AXI_arprot		(mbus_M_AXI_arprot),
+		.mbus_M_AXI_arqos		(mbus_M_AXI_arqos),
+		.mbus_M_AXI_arready		(mbus_M_AXI_arready),
+		.mbus_M_AXI_arregion	(mbus_M_AXI_arregion),
+		.mbus_M_AXI_arsize		(mbus_M_AXI_arsize),
+		.mbus_M_AXI_arvalid		(mbus_M_AXI_arvalid),
+		.mbus_M_AXI_awaddr		(mbus_M_AXI_awaddr),
+		.mbus_M_AXI_awburst		(mbus_M_AXI_awburst),
+		.mbus_M_AXI_awcache		(mbus_M_AXI_awcache),
+		.mbus_M_AXI_awid		(mbus_M_AXI_awid),
+		.mbus_M_AXI_awlen		(mbus_M_AXI_awlen),
+		.mbus_M_AXI_awlock		(mbus_M_AXI_awlock),
+		.mbus_M_AXI_awprot		(mbus_M_AXI_awprot),
+		.mbus_M_AXI_awqos		(mbus_M_AXI_awqos),
+		.mbus_M_AXI_awready		(mbus_M_AXI_awready),
+		.mbus_M_AXI_awregion	(mbus_M_AXI_awregion),
+		.mbus_M_AXI_awsize		(mbus_M_AXI_awsize),
+		.mbus_M_AXI_awvalid		(mbus_M_AXI_awvalid),
+		.mbus_M_AXI_bid			(mbus_M_AXI_bid),
+		.mbus_M_AXI_bready		(mbus_M_AXI_bready),
+		.mbus_M_AXI_bresp		(mbus_M_AXI_bresp),
+		.mbus_M_AXI_bvalid		(mbus_M_AXI_bvalid),
+		.mbus_M_AXI_rdata		(mbus_M_AXI_rdata),
+		.mbus_M_AXI_rid			(mbus_M_AXI_rid),
+		.mbus_M_AXI_rlast		(mbus_M_AXI_rlast),
+		.mbus_M_AXI_rready		(mbus_M_AXI_rready),
+		.mbus_M_AXI_rresp		(mbus_M_AXI_rresp),
+		.mbus_M_AXI_rvalid		(mbus_M_AXI_rvalid),
+		.mbus_M_AXI_wdata		(mbus_M_AXI_wdata),
+		.mbus_M_AXI_wlast		(mbus_M_AXI_wlast),
+		.mbus_M_AXI_wready		(mbus_M_AXI_wready),
+		.mbus_M_AXI_wstrb		(mbus_M_AXI_wstrb),
+		.mbus_M_AXI_wvalid		(mbus_M_AXI_wvalid),
+	   //connect to DoCE
+		.tile_M_AXI_araddr		(tile_M_AXI_araddr),
+		.tile_M_AXI_arburst		(tile_M_AXI_arburst),
+		.tile_M_AXI_arcache		(tile_M_AXI_arcache),
+		.tile_M_AXI_arid		(tile_M_AXI_arid),
+		.tile_M_AXI_arlen		(tile_M_AXI_arlen),
+		.tile_M_AXI_arlock		(tile_M_AXI_arlock),
+		.tile_M_AXI_arprot		(tile_M_AXI_arprot),
+		.tile_M_AXI_arqos		(tile_M_AXI_arqos),
+		.tile_M_AXI_arready		(tile_M_AXI_arready),
+		.tile_M_AXI_arregion	(tile_M_AXI_arregion),
+		.tile_M_AXI_arsize		(tile_M_AXI_arsize),
+		.tile_M_AXI_arvalid		(tile_M_AXI_arvalid),
+		.tile_M_AXI_awaddr		(tile_M_AXI_awaddr),
+		.tile_M_AXI_awburst		(tile_M_AXI_awburst),
+		.tile_M_AXI_awcache		(tile_M_AXI_awcache),
+		.tile_M_AXI_awid		(tile_M_AXI_awid),
+		.tile_M_AXI_awlen		(tile_M_AXI_awlen),
+		.tile_M_AXI_awlock		(tile_M_AXI_awlock),
+		.tile_M_AXI_awprot		(tile_M_AXI_awprot),
+		.tile_M_AXI_awqos		(tile_M_AXI_awqos),
+		.tile_M_AXI_awready		(tile_M_AXI_awready),
+		.tile_M_AXI_awregion	(tile_M_AXI_awregion),
+		.tile_M_AXI_awsize		(tile_M_AXI_awsize),
+		.tile_M_AXI_awvalid		(tile_M_AXI_awvalid),
+		.tile_M_AXI_bid			(tile_M_AXI_bid),
+		.tile_M_AXI_bready		(tile_M_AXI_bready),
+		.tile_M_AXI_bresp		(tile_M_AXI_bresp),
+		.tile_M_AXI_bvalid		(tile_M_AXI_bvalid),
+		.tile_M_AXI_rdata		(tile_M_AXI_rdata),
+		.tile_M_AXI_rid			(tile_M_AXI_rid),
+		.tile_M_AXI_rlast		(tile_M_AXI_rlast),
+		.tile_M_AXI_rready		(tile_M_AXI_rready),
+		.tile_M_AXI_rresp		(tile_M_AXI_rresp),
+		.tile_M_AXI_rvalid		(tile_M_AXI_rvalid),
+		.tile_M_AXI_wdata		(tile_M_AXI_wdata),
+		.tile_M_AXI_wlast		(tile_M_AXI_wlast),
+		.tile_M_AXI_wready		(tile_M_AXI_wready),
+		.tile_M_AXI_wstrb		(tile_M_AXI_wstrb),
+		.tile_M_AXI_wvalid		(tile_M_AXI_wvalid)
         );
 
   assign reset = !FCLK_RESET0_N || !mmcm_locked;
 
-  wire [31:0] mem_araddr;
-  wire [31:0] mem_awaddr;
-
   // Memory given to Rocket is the upper 256 MB of the 512 MB DRAM
-  assign S_AXI_araddr = {4'd1, mem_araddr[27:0]};
-  assign S_AXI_awaddr = {4'd1, mem_awaddr[27:0]};
+  wire [3:0] high_araddr;
+  wire [3:0] high_awaddr;
+  assign high_araddr = mem_araddr[29:28] == 2'd0 ? 4'd1
+                         : (mem_araddr[29:28] == 2'd1 ? 4'd0 : {2'd0,mem_araddr[29:28]});
+  assign high_awaddr = mem_awaddr[29:28] == 2'd0 ? 4'd1
+                                                : (mem_awaddr[29:28] == 2'd1 ? 4'd0 : {2'd0,mem_awaddr[29:28]});
+  assign S_AXI_araddr = {high_araddr, mem_araddr[27:0]};
+  assign S_AXI_awaddr = {high_awaddr, mem_awaddr[27:0]};//{2'd0, mem_awaddr[29:0]
 
   Top top(
    .clock(host_clk),
@@ -375,14 +632,14 @@ module rocketchip_wrapper
    .io_ps_axi_slave_r_valid (M_AXI_rvalid),
    .io_ps_axi_slave_r_ready (M_AXI_rready),
    .io_ps_axi_slave_r_bits_id (M_AXI_rid),
-   .io_ps_axi_slave_r_bits_resp (M_AXI_rresp),
+   .io_ps_axi_slave_r_bits_resp (),
    .io_ps_axi_slave_r_bits_data (M_AXI_rdata),
    .io_ps_axi_slave_r_bits_last (M_AXI_rlast),
 
    .io_ps_axi_slave_b_valid (M_AXI_bvalid),
    .io_ps_axi_slave_b_ready (M_AXI_bready),
    .io_ps_axi_slave_b_bits_id (M_AXI_bid),
-   .io_ps_axi_slave_b_bits_resp (M_AXI_bresp),
+   .io_ps_axi_slave_b_bits_resp (),
 
    .io_mem_axi_ar_valid (S_AXI_arvalid),
    .io_mem_axi_ar_ready (S_AXI_arready),
@@ -462,13 +719,51 @@ module rocketchip_wrapper
    .io_hcpf_axi_r_bits_id (hcpf_AXI_rid),
    .io_hcpf_axi_r_bits_data (hcpf_AXI_rdata), // @[:Top.ZynqFPGAConfig.fir@136622.4]
    .io_hcpf_axi_r_bits_resp (),
-   .io_hcpf_axi_r_bits_last (hcpf_AXI_rlast)
+   .io_hcpf_axi_r_bits_last (hcpf_AXI_rlast),
+   
+   .io_mmio_axi_aw_ready		(io_mmio_axi_aw_ready), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_valid		(io_mmio_axi_aw_valid), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_id		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_addr	(io_mmio_axi_aw_bits_addr), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_len		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_size	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_burst	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_lock	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_cache	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_prot	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_aw_bits_qos		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_w_ready			(io_mmio_axi_w_ready), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_w_valid			(io_mmio_axi_w_valid), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_w_bits_data		(io_mmio_axi_w_bits_data), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_w_bits_strb		(io_mmio_axi_w_bits_strb), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_w_bits_last		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_b_ready			(io_mmio_axi_b_ready), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_b_valid			(io_mmio_axi_b_valid), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_b_bits_id		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_b_bits_resp		(io_mmio_axi_b_bits_resp), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_ready		(io_mmio_axi_ar_ready), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_valid		(io_mmio_axi_ar_valid), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_id		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_addr	(io_mmio_axi_ar_bits_addr), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_len		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_size	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_burst	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_lock	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_cache	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_prot	(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_ar_bits_qos		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_r_ready			(io_mmio_axi_r_ready), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_r_valid			(io_mmio_axi_r_valid), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_r_bits_id		(), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_r_bits_data		(io_mmio_axi_r_bits_data), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_r_bits_resp		(io_mmio_axi_r_bits_resp), // @[:Top.ZynqFPGAConfig.fir@183370.4]
+   .io_mmio_axi_r_bits_last		 ()// @[:Top.ZynqFPGAConfig.fir@183370.4]
   );
-`ifndef differential_clock
-  IBUFG ibufg_gclk (.I(clk), .O(gclk_i));
-`else
-  IBUFDS #(.DIFF_TERM("TRUE"), .IBUF_LOW_PWR("TRUE"), .IOSTANDARD("DEFAULT")) clk_ibufds (.O(gclk_i), .I(SYSCLK_P), .IB(SYSCLK_N));
-`endif
+//`ifndef differential_clock
+//  IBUFG ibufg_gclk (.I(clk), .O(gclk_i));
+//`else//
+//  IBUFDS #(.DIFF_TERM("TRUE"), .IBUF_LOW_PWR("TRUE"), .IOSTANDARD("DEFAULT")) clk_ibufds (.O(gclk_i), .I(SYSCLK_P), .IB(SYSCLK_N));
+//`endif
   BUFG  bufg_host_clk (.I(host_clk_i), .O(host_clk));
 
   MMCME2_BASE #(
@@ -516,7 +811,7 @@ module rocketchip_wrapper
     .CLKFBOUT(gclk_fbout),
     .CLKFBOUTB(),
     .LOCKED(mmcm_locked),
-    .CLKIN1(gclk_i),
+    .CLKIN1(FCLK_CLK),
     .PWRDWN(1'b0),
     .RST(1'b0),
     .CLKFBIN(gclk_fbout));

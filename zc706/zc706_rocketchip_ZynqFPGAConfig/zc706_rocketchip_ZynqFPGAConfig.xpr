@@ -33,20 +33,20 @@
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSABoardId" Val="zc706"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="117"/>
+    <Option Name="WTXSimLaunchSim" Val="122"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="5"/>
-    <Option Name="WTModelSimExportSim" Val="5"/>
-    <Option Name="WTQuestaExportSim" Val="5"/>
-    <Option Name="WTIesExportSim" Val="5"/>
-    <Option Name="WTVcsExportSim" Val="5"/>
-    <Option Name="WTRivieraExportSim" Val="5"/>
-    <Option Name="WTActivehdlExportSim" Val="5"/>
+    <Option Name="WTXSimExportSim" Val="72"/>
+    <Option Name="WTModelSimExportSim" Val="72"/>
+    <Option Name="WTQuestaExportSim" Val="72"/>
+    <Option Name="WTIesExportSim" Val="72"/>
+    <Option Name="WTVcsExportSim" Val="72"/>
+    <Option Name="WTRivieraExportSim" Val="72"/>
+    <Option Name="WTActivehdlExportSim" Val="72"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -62,29 +62,23 @@
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
-        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_proc_sys_reset_0_0/system_proc_sys_reset_0_0.xci">
-          <Proxy FileSetName="system_proc_sys_reset_0_0"/>
-        </CompFileExtendedInfo>
         <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_processing_system7_0_0/system_processing_system7_0_0.xci">
           <Proxy FileSetName="system_processing_system7_0_0"/>
         </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_auto_pc_2/system_auto_pc_2.xci">
-          <Proxy FileSetName="system_auto_pc_2"/>
+        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_proc_sys_reset_0_0/system_proc_sys_reset_0_0.xci">
+          <Proxy FileSetName="system_proc_sys_reset_0_0"/>
         </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_auto_pc_1/system_auto_pc_1.xci">
-          <Proxy FileSetName="system_auto_pc_1"/>
+        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_xbar_0/system_xbar_0.xci">
+          <Proxy FileSetName="system_xbar_0"/>
         </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_auto_pc_0/system_auto_pc_0.xci">
-          <Proxy FileSetName="system_auto_pc_0"/>
+        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_xbar_2/system_xbar_2.xci">
+          <Proxy FileSetName="system_xbar_2"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="system.bd" FileRelPathName="ip/system_xbar_1/system_xbar_1.xci">
+          <Proxy FileSetName="system_xbar_1"/>
         </CompFileExtendedInfo>
       </File>
       <File Path="$PPRDIR/../src/verilog/AsyncResetReg.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../src/verilog/Top.ZynqFPGAConfig.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -137,9 +131,389 @@
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/m_r_stream_data_fifo/m_r_stream_data_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/rx_barrier_fifo/rx_barrier_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/s_ar_fifo/s_ar_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/s_aw_fifo/s_aw_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/axis_data_fifo/axis_data_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/r_num_fifo/r_num_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/m_ar_fifo/m_ar_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/tx_stream_switch/tx_stream_switch.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/axis_cmd_fifo/axis_cmd_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/s_r_fifo/s_r_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/axis_dc_64_to_128/axis_dc_64_to_128.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/axis_dc_128_to_64/axis_dc_128_to_64.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/s_b_fifo/s_b_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/m_b_fifo/m_b_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/s_w_stream_data_fifo/s_w_stream_data_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/m_w_fifo/m_w_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/axi_lite_crossbar/axi_lite_crossbar.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/doce/m_aw_fifo/m_aw_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/ar_decode.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/rx_switch.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/aw_width_converter.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transport_layer/rx_fsm.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/doce_top.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transport_layer/transport_layer.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transport_layer/tx_fsm.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/doce_transaction_layer.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/m_inter_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/id_inquire.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/s_inter_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/axi_rx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/axi_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/barrier_tx.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/r_width_converter.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transport_layer/mac_id_table.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/r_decode.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/aw_decode.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_cores/doce/transaction_layer/r_connection_id_gene.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/xgbe_path/rx_interface.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/xgbe_path/xgbe_path.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/xgbe_path/axi_10g_ethernet_0_axi_lite_sm.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/xgbe_rx_if/axis_async_fifo/axis_async_fifo.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/ip_catalog/xgbe_rx_if/cmd_fifo_xgemac_rxif/cmd_fifo_xgemac_rxif.xci">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/common/mac_addr_reg.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/common/synchronizer_simple.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/common/axi_shim.v">
+        <FileInfo>
+          <Attr Name="UserDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/packet_dispatch/xgbe_mac_rx_dispatch.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/packet_router/packet_router.bd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+        <CompFileExtendedInfo CompFileName="packet_router.bd" FileRelPathName="ip/packet_router_s00_data_fifo_1/packet_router_s00_data_fifo_1.xci">
+          <Proxy FileSetName="packet_router_s00_data_fifo_1"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="packet_router.bd" FileRelPathName="ip/packet_router_auto_cc_1/packet_router_auto_cc_1.xci">
+          <Proxy FileSetName="packet_router_auto_cc_1"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="packet_router.bd" FileRelPathName="ip/packet_router_s00_data_fifo_0/packet_router_s00_data_fifo_0.xci">
+          <Proxy FileSetName="packet_router_s00_data_fifo_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="packet_router.bd" FileRelPathName="ip/packet_router_auto_cc_0/packet_router_auto_cc_0.xci">
+          <Proxy FileSetName="packet_router_auto_cc_0"/>
+        </CompFileExtendedInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/packet_router/hdl/packet_router_wrapper.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/rocketchip_DoCE_wrapper.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/xgbe_component/xgbe_component.bd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+        <CompFileExtendedInfo CompFileName="xgbe_component.bd" FileRelPathName="ip/xgbe_component_xgbe_mac_0/xgbe_component_xgbe_mac_0.xci">
+          <Proxy FileSetName="xgbe_component_xgbe_mac_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="xgbe_component.bd" FileRelPathName="ip/xgbe_component_xgbe_phy_0/xgbe_component_xgbe_phy_0.xci">
+          <Proxy FileSetName="xgbe_component_xgbe_phy_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="xgbe_component.bd" FileRelPathName="ip/xgbe_component_const_vcc_0/xgbe_component_const_vcc_0.xci">
+          <Proxy FileSetName="xgbe_component_const_vcc_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="xgbe_component.bd" FileRelPathName="ip/xgbe_component_const_gnd_0/xgbe_component_const_gnd_0.xci">
+          <Proxy FileSetName="xgbe_component_const_gnd_0"/>
+        </CompFileExtendedInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/xgbe_component/hdl/xgbe_component_wrapper.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/clock_control/kcpsm6.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/clock_control/clock_control_program.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/DoCE/hardware/sources/hdl/clock_control/clock_control.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/rocket_DoCE_SoC/rocket_DoCE_SoC.bd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+        <CompFileExtendedInfo CompFileName="rocket_DoCE_SoC.bd" FileRelPathName="ip/rocket_DoCE_SoC_mig_ic_reset_0/rocket_DoCE_SoC_mig_ic_reset_0.xci">
+          <Proxy FileSetName="rocket_DoCE_SoC_mig_ic_reset_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="rocket_DoCE_SoC.bd" FileRelPathName="ip/rocket_DoCE_SoC_device_temp_0/rocket_DoCE_SoC_device_temp_0.xci">
+          <Proxy FileSetName="rocket_DoCE_SoC_device_temp_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="rocket_DoCE_SoC.bd" FileRelPathName="ip/rocket_DoCE_SoC_xbar_1/rocket_DoCE_SoC_xbar_1.xci">
+          <Proxy FileSetName="rocket_DoCE_SoC_xbar_1"/>
+        </CompFileExtendedInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/rocket_DoCE_SoC/ip/rocket_DoCE_SoC_mig_pl_ddr3_2/mig_a.prj">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="ScopedToCell" Val="rocket_DoCE_SoC_mig_pl_ddr3_2"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/rocket_DoCE_SoC/hdl/rocket_DoCE_SoC_wrapper.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../src/verilog/Top.ZynqHCPFFPGAConfig.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="rocketchip_wrapper"/>
+        <Option Name="TopModule" Val="rocketchip_DoCE_wrapper"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -200,21 +574,87 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="system_auto_pc_2" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_auto_pc_2">
+    <FileSet Name="system_xbar_2" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_xbar_2">
       <Config>
-        <Option Name="TopModule" Val="system_auto_pc_2"/>
+        <Option Name="TopModule" Val="system_xbar_2"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="system_auto_pc_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_auto_pc_0">
+    <FileSet Name="system_xbar_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_xbar_0">
       <Config>
-        <Option Name="TopModule" Val="system_auto_pc_0"/>
+        <Option Name="TopModule" Val="system_xbar_0"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
-    <FileSet Name="system_auto_pc_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_auto_pc_1">
+    <FileSet Name="packet_router_s00_data_fifo_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/packet_router_s00_data_fifo_1">
       <Config>
-        <Option Name="TopModule" Val="system_auto_pc_1"/>
+        <Option Name="TopModule" Val="packet_router_s00_data_fifo_1"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="packet_router_auto_cc_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/packet_router_auto_cc_1">
+      <Config>
+        <Option Name="TopModule" Val="packet_router_auto_cc_1"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="packet_router_s00_data_fifo_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/packet_router_s00_data_fifo_0">
+      <Config>
+        <Option Name="TopModule" Val="packet_router_s00_data_fifo_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="packet_router_auto_cc_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/packet_router_auto_cc_0">
+      <Config>
+        <Option Name="TopModule" Val="packet_router_auto_cc_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="xgbe_component_xgbe_mac_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/xgbe_component_xgbe_mac_0">
+      <Config>
+        <Option Name="TopModule" Val="xgbe_component_xgbe_mac_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="xgbe_component_xgbe_phy_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/xgbe_component_xgbe_phy_0">
+      <Config>
+        <Option Name="TopModule" Val="xgbe_component_xgbe_phy_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="xgbe_component_const_vcc_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/xgbe_component_const_vcc_0">
+      <Config>
+        <Option Name="TopModule" Val="xgbe_component_const_vcc_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="xgbe_component_const_gnd_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/xgbe_component_const_gnd_0">
+      <Config>
+        <Option Name="TopModule" Val="xgbe_component_const_gnd_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="rocket_DoCE_SoC_mig_ic_reset_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/rocket_DoCE_SoC_mig_ic_reset_0">
+      <Config>
+        <Option Name="TopModule" Val="rocket_DoCE_SoC_mig_ic_reset_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="rocket_DoCE_SoC_device_temp_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/rocket_DoCE_SoC_device_temp_0">
+      <Config>
+        <Option Name="TopModule" Val="rocket_DoCE_SoC_device_temp_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="rocket_DoCE_SoC_xbar_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/rocket_DoCE_SoC_xbar_1">
+      <Config>
+        <Option Name="TopModule" Val="rocket_DoCE_SoC_xbar_1"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
+    <FileSet Name="system_xbar_1" Type="BlockSrcs" RelSrcDir="$PSRCDIR/system_xbar_1">
+      <Config>
+        <Option Name="TopModule" Val="system_xbar_1"/>
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
@@ -268,7 +708,7 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="system_auto_pc_2_synth_1" Type="Ft3:Synth" SrcSet="system_auto_pc_2" Part="xc7z045ffg900-2" ConstrsSet="system_auto_pc_2" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_auto_pc_2_synth_1" IncludeInArchive="true">
+    <Run Id="system_xbar_2_synth_1" Type="Ft3:Synth" SrcSet="system_xbar_2" Part="xc7z045ffg900-2" ConstrsSet="system_xbar_2" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_xbar_2_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
@@ -277,7 +717,7 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="system_auto_pc_0_synth_1" Type="Ft3:Synth" SrcSet="system_auto_pc_0" Part="xc7z045ffg900-2" ConstrsSet="system_auto_pc_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_auto_pc_0_synth_1" IncludeInArchive="true">
+    <Run Id="system_xbar_0_synth_1" Type="Ft3:Synth" SrcSet="system_xbar_0" Part="xc7z045ffg900-2" ConstrsSet="system_xbar_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_xbar_0_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
@@ -286,7 +726,106 @@
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="system_auto_pc_1_synth_1" Type="Ft3:Synth" SrcSet="system_auto_pc_1" Part="xc7z045ffg900-2" ConstrsSet="system_auto_pc_1" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_auto_pc_1_synth_1" IncludeInArchive="true">
+    <Run Id="packet_router_s00_data_fifo_1_synth_1" Type="Ft3:Synth" SrcSet="packet_router_s00_data_fifo_1" Part="xc7z045ffg900-2" ConstrsSet="packet_router_s00_data_fifo_1" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/packet_router_s00_data_fifo_1_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="packet_router_auto_cc_1_synth_1" Type="Ft3:Synth" SrcSet="packet_router_auto_cc_1" Part="xc7z045ffg900-2" ConstrsSet="packet_router_auto_cc_1" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/packet_router_auto_cc_1_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="packet_router_s00_data_fifo_0_synth_1" Type="Ft3:Synth" SrcSet="packet_router_s00_data_fifo_0" Part="xc7z045ffg900-2" ConstrsSet="packet_router_s00_data_fifo_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/packet_router_s00_data_fifo_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="packet_router_auto_cc_0_synth_1" Type="Ft3:Synth" SrcSet="packet_router_auto_cc_0" Part="xc7z045ffg900-2" ConstrsSet="packet_router_auto_cc_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/packet_router_auto_cc_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_xgbe_mac_0_synth_1" Type="Ft3:Synth" SrcSet="xgbe_component_xgbe_mac_0" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_xgbe_mac_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/xgbe_component_xgbe_mac_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_xgbe_phy_0_synth_1" Type="Ft3:Synth" SrcSet="xgbe_component_xgbe_phy_0" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_xgbe_phy_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/xgbe_component_xgbe_phy_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_const_vcc_0_synth_1" Type="Ft3:Synth" SrcSet="xgbe_component_const_vcc_0" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_const_vcc_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/xgbe_component_const_vcc_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_const_gnd_0_synth_1" Type="Ft3:Synth" SrcSet="xgbe_component_const_gnd_0" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_const_gnd_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/xgbe_component_const_gnd_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="rocket_DoCE_SoC_mig_ic_reset_0_synth_1" Type="Ft3:Synth" SrcSet="rocket_DoCE_SoC_mig_ic_reset_0" Part="xc7z045ffg900-2" ConstrsSet="rocket_DoCE_SoC_mig_ic_reset_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/rocket_DoCE_SoC_mig_ic_reset_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="rocket_DoCE_SoC_device_temp_0_synth_1" Type="Ft3:Synth" SrcSet="rocket_DoCE_SoC_device_temp_0" Part="xc7z045ffg900-2" ConstrsSet="rocket_DoCE_SoC_device_temp_0" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/rocket_DoCE_SoC_device_temp_0_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="rocket_DoCE_SoC_xbar_1_synth_1" Type="Ft3:Synth" SrcSet="rocket_DoCE_SoC_xbar_1" Part="xc7z045ffg900-2" ConstrsSet="rocket_DoCE_SoC_xbar_1" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/rocket_DoCE_SoC_xbar_1_synth_1" IncludeInArchive="true">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="system_xbar_1_synth_1" Type="Ft3:Synth" SrcSet="system_xbar_1" Part="xc7z045ffg900-2" ConstrsSet="system_xbar_1" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/system_xbar_1_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017"/>
         <Step Id="synth_design"/>
@@ -344,7 +883,7 @@
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="system_auto_pc_2_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="system_auto_pc_2" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="system_auto_pc_2_synth_1" IncludeInArchive="false">
+    <Run Id="system_xbar_2_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="system_xbar_2" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="system_xbar_2_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
@@ -360,7 +899,7 @@
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="system_auto_pc_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="system_auto_pc_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="system_auto_pc_0_synth_1" IncludeInArchive="false">
+    <Run Id="system_xbar_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="system_xbar_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="system_xbar_0_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
@@ -376,7 +915,183 @@
       <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
       <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
     </Run>
-    <Run Id="system_auto_pc_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="system_auto_pc_1" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="system_auto_pc_1_synth_1" IncludeInArchive="false">
+    <Run Id="packet_router_s00_data_fifo_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="packet_router_s00_data_fifo_1" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="packet_router_s00_data_fifo_1_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="packet_router_auto_cc_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="packet_router_auto_cc_1" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="packet_router_auto_cc_1_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="packet_router_s00_data_fifo_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="packet_router_s00_data_fifo_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="packet_router_s00_data_fifo_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="packet_router_auto_cc_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="packet_router_auto_cc_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="packet_router_auto_cc_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_xgbe_mac_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_xgbe_mac_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="xgbe_component_xgbe_mac_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_xgbe_phy_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_xgbe_phy_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="xgbe_component_xgbe_phy_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_const_vcc_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_const_vcc_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="xgbe_component_const_vcc_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="xgbe_component_const_gnd_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="xgbe_component_const_gnd_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="xgbe_component_const_gnd_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="rocket_DoCE_SoC_mig_ic_reset_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="rocket_DoCE_SoC_mig_ic_reset_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="rocket_DoCE_SoC_mig_ic_reset_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="rocket_DoCE_SoC_device_temp_0_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="rocket_DoCE_SoC_device_temp_0" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="rocket_DoCE_SoC_device_temp_0_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="rocket_DoCE_SoC_xbar_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="rocket_DoCE_SoC_xbar_1" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="rocket_DoCE_SoC_xbar_1_synth_1" IncludeInArchive="false">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2017"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+    </Run>
+    <Run Id="system_xbar_1_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="system_xbar_1" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="system_xbar_1_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
         <Step Id="init_design"/>
