@@ -666,7 +666,6 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
   readstage.io.rdAddrPtr3 := new_read_addr_ptr3
   readstage.io.FreeEntryPtr3 := free_entry_ptr3
   readstage.io.rdTableEntry3 := read_table3.io.rdata1
-
 }
 
 class HCPFTLBundle extends Bundle {

@@ -602,6 +602,9 @@ class HCPFType4ControllerBundle (params: HCPFParams) extends Bundle{
     val CpuReadEntry1 = Output(new ReadTableEntry)
     val CpuReadEntry2 = Output(new ReadTableEntry)
     val CpuReadEntry3 = Output(new ReadTableEntry)
+    val readbase1 = Input(UInt(28.W))
+    val readbase2 = Input(UInt(28.W))
+    val readbase3 = Input(UInt(28.W))
     //val ReadTableFinish = Output(Bool())
     val PtrReset = Input(Bool())
 }
@@ -618,14 +621,50 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     val read_table1 = Module(new ReadTable(params))
     val read_table2 = Module(new ReadTable(params))
     val read_table3 = Module(new ReadTable(params))
-    val read_type1 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 1.U(2.W)
-    val read_type2 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 2.U(2.W)
-    val read_type3 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 3.U(2.W)
+    val scatter :: normal :: Nil = Enum(2)
+    val controller4_status = RegInit(normal)
+    val read_type1 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 1.U(2.W) && controller4_status =/= scatter
+    val read_type2 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 2.U(2.W) && controller4_status =/= scatter
+    val read_type3 = io.Request.valid === true.B && io.Request.bits.others(1,0) === 3.U(2.W) && controller4_status =/= scatter
+    val scatter_type = RegInit(VecInit(Seq(0.U(1.W),0.U(1.W),0.U(1.W))))//io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W) && io.Request.bits.others(3,2) === 1.U(2.W)
+    val scatter_index = RegInit(VecInit(Seq(0.U(10.W),0.U(10.W),0.U(10.W),0.U(10.W))))
+    val scatter_entry_size = RegInit(0.U(5.W))
+    val scatter_read_size = RegInit(0.U(3.W))
+    val scatter_sent_count = RegInit(0.U(2.W))//val scatter_type2 = //io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W) && io.Request.bits.others(3,2) === 2.U(2.W)
+    val scatter_buff_ptr = RegInit(0.U(10.W))
+    //val scatter_type3 = //io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W) && io.Request.bits.others(3,2) === 3.U(2.W)
     val addr_notsent_count1 = RegInit(0.U((log2Ceil(params.tableEntryNum)+1).W))
     val addr_notsent_count2 = RegInit(0.U((log2Ceil(params.tableEntryNum)+1).W))
     val addr_notsent_count3 = RegInit(0.U((log2Ceil(params.tableEntryNum)+1).W))
 
-    io.Request.ready := true.B
+    io.Request.ready := true.B//controller4_status =/= scatter || (controller4_status === scatter && scatter_sent_count)
+    //scatter instruction
+    when(io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W)){
+        controller4_status := scatter
+    }.elsewhen(scatter_sent_count === 3.U){
+        controller4_status := normal
+    }
+
+    when(io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W)){
+        scatter_index := Seq(io.Request.bits.others(61,52),io.Request.bits.others(51,42),io.Request.bits.others(41,32),io.Request.bits.others(31,22))
+        scatter_entry_size := io.Request.bits.others(11,7)
+        scatter_read_size := io.Request.bits.others(6,4)
+        scatter_buff_ptr := io.Request.bits.others(21,12)
+    }
+
+    when(io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W) && io.Request.bits.others(3,2) === 1.U(2.W)){
+        scatter_type := Seq(1.U(1.W),0.U(1.W),0.U(1.W))
+    }.elsewhen(io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W) && io.Request.bits.others(3,2) === 2.U(2.W)){
+        scatter_type := Seq(0.U(1.W),1.U(1.W),0.U(1.W))
+    }.elsewhen(io.Request.valid === true.B && io.Request.bits.others(1,0) === 0.U(2.W) && io.Request.bits.others(3,2) === 3.U(2.W)){
+        scatter_type := Seq(0.U(1.W),0.U(1.W),1.U(1.W))
+    }.elsewhen(scatter_sent_count === 3.U){
+        scatter_type := Seq(0.U(1.W),0.U(1.W),0.U(1.W))
+    }
+
+    when(controller4_status === scatter){
+        scatter_sent_count := scatter_sent_count + 1.U
+    }
     //instruction 1
     io.RStageAxi <> readstage.io.axi
     io.CpuOperateEntry1 := read_table1.io.rdata3
@@ -643,11 +682,18 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     io.RdStatus3 := readstage.io.rdStatus3
     //io.ReadTableFinish := io.CpuOperatePtr === free_entry_ptr1
 
-    read_table1.io.wen := read_type1 === true.B
-    read_table1.io.wdata.option := 0.U
-    read_table1.io.wdata.raddr := io.Request.bits.others(29,2)
-    read_table1.io.wdata.rsize := io.Request.bits.others(61,52)
-    read_table1.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+    read_table1.io.wen := read_type1 === true.B || (controller4_status === scatter && scatter_type(0) === 1.U)
+    when(controller4_status === scatter && scatter_type(0) === 1.U){
+        read_table1.io.wdata.option := 0.U
+        read_table1.io.wdata.raddr := io.readbase1 + scatter_index(scatter_sent_count) * scatter_entry_size
+        read_table1.io.wdata.rsize := scatter_read_size * 4.U(10.W)
+        read_table1.io.wdata.rdata_ptr := scatter_buff_ptr + scatter_read_size * scatter_sent_count
+    }.otherwise{
+        read_table1.io.wdata.option := 0.U
+        read_table1.io.wdata.raddr := io.Request.bits.others(29,2)
+        read_table1.io.wdata.rsize := io.Request.bits.others(61,52)
+        read_table1.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+    }
     read_table1.io.waddr := free_entry_ptr1
     read_table1.io.raddr1 := readstage.io.rdTablePtr
     read_table1.io.raddr2 := new_read_addr_ptr1
@@ -655,7 +701,7 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     read_table1.io.raddr4 := io.CpuOperatePtr1 + io.CpuReadOffset1
     when(io.PtrReset === true.B){
         free_entry_ptr1 := 0.U
-    }.elsewhen(read_type1 === true.B){
+    }.elsewhen(read_type1 === true.B || (controller4_status === scatter && scatter_type(0) === 1.U)){
         free_entry_ptr1 := free_entry_ptr1 + 1.U
     }
     when(io.PtrReset === true.B){
@@ -663,17 +709,24 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     }.elsewhen(readstage.io.rdAddrEntry1.ready === true.B && readstage.io.rdAddrEntry1.valid === true.B){
         new_read_addr_ptr1 := new_read_addr_ptr1 + 1.U
     }
-    when(read_type1 === true.B && !(readstage.io.rdAddrEntry1.ready === true.B && readstage.io.rdAddrEntry1.valid === true.B)){
+    when((read_type1 === true.B || (controller4_status === scatter && scatter_type(0) === 1.U)) && !(readstage.io.rdAddrEntry1.ready === true.B && readstage.io.rdAddrEntry1.valid === true.B)){
         addr_notsent_count1 := addr_notsent_count1 + 1.U
-    }.elsewhen(read_type1 === false.B && (readstage.io.rdAddrEntry1.ready === true.B && readstage.io.rdAddrEntry1.valid === true.B)){
+    }.elsewhen(!(read_type1 === true.B || (controller4_status === scatter && scatter_type(0) === 1.U)) && (readstage.io.rdAddrEntry1.ready === true.B && readstage.io.rdAddrEntry1.valid === true.B)){
         addr_notsent_count1 := addr_notsent_count1 - 1.U
     }
 
-    read_table2.io.wen := read_type2 === true.B
-    read_table2.io.wdata.option := 0.U
-    read_table2.io.wdata.raddr := io.Request.bits.others(29,2)
-    read_table2.io.wdata.rsize := io.Request.bits.others(61,52)
-    read_table2.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+    read_table2.io.wen := read_type2 === true.B || (controller4_status === scatter && scatter_type(1) === 1.U)
+    when(controller4_status === scatter && scatter_type(1) === 1.U){
+        read_table2.io.wdata.option := 0.U
+        read_table2.io.wdata.raddr := io.readbase2 + scatter_index(scatter_sent_count) * scatter_entry_size
+        read_table2.io.wdata.rsize := scatter_read_size * 4.U(10.W)
+        read_table2.io.wdata.rdata_ptr := scatter_buff_ptr + scatter_read_size * scatter_sent_count
+    }.otherwise{
+        read_table2.io.wdata.option := 0.U
+        read_table2.io.wdata.raddr := io.Request.bits.others(29,2)
+        read_table2.io.wdata.rsize := io.Request.bits.others(61,52)
+        read_table2.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+    }
     read_table2.io.waddr := free_entry_ptr2
     read_table2.io.raddr1 := readstage.io.rdTablePtr
     read_table2.io.raddr2 := new_read_addr_ptr2
@@ -681,7 +734,7 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     read_table2.io.raddr4 := io.CpuOperatePtr2
     when(io.PtrReset === true.B){
         free_entry_ptr2 := 0.U
-    }.elsewhen(read_type2 === true.B){
+    }.elsewhen(read_type2 === true.B || (controller4_status === scatter && scatter_type(1) === 1.U)){
         free_entry_ptr2 := free_entry_ptr2 + 1.U
     }
     when(io.PtrReset === true.B){
@@ -689,17 +742,24 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     }.elsewhen(readstage.io.rdAddrEntry2.ready === true.B && readstage.io.rdAddrEntry2.valid === true.B){
         new_read_addr_ptr2 := new_read_addr_ptr2 + 1.U
     }
-    when(read_type2 === true.B && !(readstage.io.rdAddrEntry2.ready === true.B && readstage.io.rdAddrEntry2.valid === true.B)){
+    when((read_type2 === true.B || (controller4_status === scatter && scatter_type(1) === 1.U)) && !(readstage.io.rdAddrEntry2.ready === true.B && readstage.io.rdAddrEntry2.valid === true.B)){
         addr_notsent_count2 := addr_notsent_count2 + 1.U
-    }.elsewhen(read_type2 === false.B && (readstage.io.rdAddrEntry2.ready === true.B && readstage.io.rdAddrEntry2.valid === true.B)){
+    }.elsewhen(!(read_type2 === true.B || (controller4_status === scatter && scatter_type(1) === 1.U)) && (readstage.io.rdAddrEntry2.ready === true.B && readstage.io.rdAddrEntry2.valid === true.B)){
         addr_notsent_count2 := addr_notsent_count2 - 1.U
     }
 
-    read_table3.io.wen := read_type3 === true.B
-    read_table3.io.wdata.option := 0.U
-    read_table3.io.wdata.raddr := io.Request.bits.others(29,2)
-    read_table3.io.wdata.rsize := io.Request.bits.others(61,52)
-    read_table3.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+    read_table3.io.wen := read_type3 === true.B || (controller4_status === scatter && scatter_type(2) === 1.U)
+    when(controller4_status === scatter && scatter_type(2) === 1.U){
+        read_table3.io.wdata.option := 0.U
+        read_table3.io.wdata.raddr := io.readbase3 + scatter_index(scatter_sent_count) * scatter_entry_size
+        read_table3.io.wdata.rsize := scatter_read_size * 4.U(10.W)
+        read_table3.io.wdata.rdata_ptr := scatter_buff_ptr + scatter_read_size * scatter_sent_count
+    }.otherwise{
+        read_table3.io.wdata.option := 0.U
+        read_table3.io.wdata.raddr := io.Request.bits.others(29,2)
+        read_table3.io.wdata.rsize := io.Request.bits.others(61,52)
+        read_table3.io.wdata.rdata_ptr := io.Request.bits.others(39,30)
+    }
     read_table3.io.waddr := free_entry_ptr3
     read_table3.io.raddr1 := readstage.io.rdTablePtr
     read_table3.io.raddr2 := new_read_addr_ptr3
@@ -707,7 +767,7 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     read_table3.io.raddr4 := io.CpuOperatePtr3
     when(io.PtrReset === true.B){
         free_entry_ptr3 := 0.U
-    }.elsewhen(read_type3 === true.B){
+    }.elsewhen(read_type3 === true.B || (controller4_status === scatter && scatter_type(2) === 1.U)){
         free_entry_ptr3 := free_entry_ptr3 + 1.U
     }
     when(io.PtrReset === true.B){
@@ -715,28 +775,28 @@ class HCPFType4Controller (params: HCPFParams) extends  Module{
     }.elsewhen(readstage.io.rdAddrEntry3.ready === true.B && readstage.io.rdAddrEntry3.valid === true.B){
         new_read_addr_ptr3 := new_read_addr_ptr3 + 1.U
     }
-    when(read_type3 === true.B && !(readstage.io.rdAddrEntry3.ready === true.B && readstage.io.rdAddrEntry3.valid === true.B)){
+    when((read_type3 === true.B || (controller4_status === scatter && scatter_type(2) === 1.U)) && !(readstage.io.rdAddrEntry3.ready === true.B && readstage.io.rdAddrEntry3.valid === true.B)){
         addr_notsent_count3 := addr_notsent_count3 + 1.U
-    }.elsewhen(read_type3 === false.B && (readstage.io.rdAddrEntry3.ready === true.B && readstage.io.rdAddrEntry3.valid === true.B)){
+    }.elsewhen(!(read_type3 === true.B || (controller4_status === scatter && scatter_type(2) === 1.U)) && (readstage.io.rdAddrEntry3.ready === true.B && readstage.io.rdAddrEntry3.valid === true.B)){
         addr_notsent_count3 := addr_notsent_count3 - 1.U
     }
 
     readstage.io.CpuOperatePtr1 := io.CpuOperatePtr1
     readstage.io.CpuOperatePtr2 := io.CpuOperatePtr2
     readstage.io.CpuOperatePtr3 := io.CpuOperatePtr3
-    readstage.io.StatusReset1 := read_type1
+    readstage.io.StatusReset1 := read_type1 === true.B || (controller4_status === scatter && scatter_type(0) === 1.U)
     readstage.io.rdAddrEntry1.valid := addr_notsent_count1 =/= 0.U
     readstage.io.rdAddrEntry1.bits := read_table1.io.rdata2
     readstage.io.rdAddrPtr1 := new_read_addr_ptr1
     readstage.io.FreeEntryPtr1 := free_entry_ptr1
     readstage.io.rdTableEntry1 := read_table1.io.rdata1
-    readstage.io.StatusReset2 := read_type2
+    readstage.io.StatusReset2 := read_type2 === true.B || (controller4_status === scatter && scatter_type(1) === 1.U)
     readstage.io.rdAddrEntry2.valid := addr_notsent_count2 =/= 0.U
     readstage.io.rdAddrEntry2.bits := read_table2.io.rdata2
     readstage.io.rdAddrPtr2 := new_read_addr_ptr2
     readstage.io.FreeEntryPtr2 := free_entry_ptr2
     readstage.io.rdTableEntry2 := read_table2.io.rdata1
-    readstage.io.StatusReset3 := read_type3
+    readstage.io.StatusReset3 := read_type3 === true.B || (controller4_status === scatter && scatter_type(2) === 1.U)
     readstage.io.rdAddrEntry3.valid := addr_notsent_count3 =/= 0.U
     readstage.io.rdAddrEntry3.bits := read_table3.io.rdata2
     readstage.io.rdAddrPtr3 := new_read_addr_ptr3
@@ -774,6 +834,9 @@ trait HCPFTLModule  extends HasRegMap {
     val old_RWrequest = RegInit(0.U(64.W))
     val RFrequest = Wire(Flipped(Decoupled(UInt(64.W))))
     val PtrReset = RegInit(false.B)
+    val rdbase1 = RegInit(0.U(32.W))
+    val rdbase2 = RegInit(0.U(32.W))
+    val rdbase3 = RegInit(0.U(32.W))
     //val synchronize_Roffset = RegInit(false.B)
     val new_request = old_RWrequest =/= RWrequest
 
@@ -829,6 +892,9 @@ trait HCPFTLModule  extends HasRegMap {
     controler4.io.CpuOperatePtr2 := controler3.io.CpuOperatePtr2
     controler4.io.CpuOperatePtr3 := controler3.io.CpuOperatePtr3
     controler4.io.RdBufWdata.ready := controler3.io.RdBufWdata.valid =/= true.B
+    controler4.io.readbase1 := rdbase1
+    controler4.io.readbase2 := rdbase2
+    controler4.io.readbase3 := rdbase3
     //when(synchronize_Roffset === false.B){
         controler4.io.CpuReadOffset1 := read_offset1(61,62-log2Ceil(params.tableEntryNum))
         controler4.io.CpuReadOffset2 := read_offset2(61,62-log2Ceil(params.tableEntryNum))
@@ -908,7 +974,7 @@ trait HCPFTLModule  extends HasRegMap {
 
     controler4.io.Request.bits.request_type := RWrequest(63,62)
     controler4.io.Request.bits.others := RWrequest(61,0)
-    when(new_request === true.B && RWrequest(63,62) === 0.U && RWrequest(1,0) =/= 0.U(2.W)){
+    when(new_request === true.B && RWrequest(63,62) === 0.U){
         controler4.io.Request.valid := true.B
     }.otherwise{
         controler4.io.Request.valid := false.B
@@ -936,6 +1002,8 @@ trait HCPFTLModule  extends HasRegMap {
 
     when(new_request === true.B){
         old_RWrequest := RWrequest
+    }.elsewhen(PtrReset === true.B){
+        old_RWrequest := 0.U
     }
     RFrequest.ready := true.B
     io.out := read_BUFF.io.rdata1
@@ -996,6 +1064,15 @@ trait HCPFTLModule  extends HasRegMap {
         ),
         0x70 -> Seq(
             RegField.w(64, RFrequest)
+        ),
+        0x78 -> Seq(
+            RegField.w(32,rdbase1)
+        ),
+        0x7c -> Seq(
+            RegField.w(32,rdbase2)
+        ),
+        0x80 -> Seq(
+            RegField.w(32,rdbase3)
         )
     )
 }
