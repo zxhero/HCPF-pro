@@ -1,3 +1,8 @@
+The work of this repo is published:
+=========================
+[ZHANG Xu,CHANG Yisong,ZHANG Ke,CHEN Mingyu.Design and implementation of a novel off-chip memory access path for graph computing[J].Journal of National University of Defense Technology,2020,42(2):13-22](http://journal.nudt.edu.cn/gfkjdxxb/ch/reader/view_abstract.aspx?file_no=202002002&flag=1#)
+
+
 Rocket Chip on Zynq FPGAs
 =========================
 ### Warning: This repository is deprecated and does not track Rocket Chip master.
